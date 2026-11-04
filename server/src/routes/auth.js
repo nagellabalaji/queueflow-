@@ -1,0 +1,134 @@
+const express = require('express');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const db = require('../db/database');
+const { authenticateToken, JWT_SECRET } = require('../middleware/auth');
+
+const router = express.Router();
+
+// Register new manager
+router.post('/register', (req, res) => {
+  const { username, password, name } = req.body;
+
+  if (!username || !password || !name) {
+    return res.status(400).json({ error: 'Username, password, and name are required.' });
+  }
+
+  if (username.length < 3) {
+    return res.status(400).json({ error: 'Username must be at least 3 characters long.' });
+  }
+
+  if (password.length < 6) {
+    return res.status(400).json({ error: 'Password must be at least 6 characters long.' });
+  }
+
+  try {
+    const existing = db.prepare('SELECT id FROM managers WHERE LOWER(username) = LOWER(?)').get(username.trim());
+    if (existing) {
+      return res.status(409).json({ error: 'Username is already taken. Please choose another.' });
+    }
+
+    const salt = bcrypt.genSaltSync(10);
+    const password_hash = bcrypt.hashSync(password, salt);
+
+    const result = db.prepare(`
+      INSERT INTO managers (username, password_hash, name)
+      VALUES (?, ?, ?)
+    `).run(username.trim(), password_hash, name.trim());
+
+    const managerId = Number(result.lastInsertRowid);
+    const token = jwt.sign({ id: managerId, username: username.trim(), name: name.trim() }, JWT_SECRET, { expiresIn: '7d' });
+
+    res.status(201).json({
+      message: 'Registration successful',
+      token,
+      manager: { id: managerId, username: username.trim(), name: name.trim() }
+    });
+  } catch (error) {
+    console.error('Registration error:', error);
+    res.status(500).json({ error: 'Failed to register manager. Please try again.' });
+  }
+});
+
+// Login
+router.post('/login', (req, res) => {
+  const { username, password } = req.body;
+
+  if (!username || !password) {
+    return res.status(400).json({ error: 'Username and password are required.' });
+  }
+
+  try {
+    const manager = db.prepare('SELECT * FROM managers WHERE LOWER(username) = LOWER(?)').get(username.trim());
+    if (!manager) {
+      return res.status(401).json({ error: 'Invalid username or password.' });
+    }
+
+    const isMatch = bcrypt.compareSync(password, manager.password_hash);
+    if (!isMatch) {
+      return res.status(401).json({ error: 'Invalid username or password.' });
+    }
+
+    const token = jwt.sign(
+      { id: manager.id, username: manager.username, name: manager.name },
+      JWT_SECRET,
+      { expiresIn: '7d' }
+    );
+
+    res.json({
+      message: 'Login successful',
+      token,
+      manager: { id: manager.id, username: manager.username, name: manager.name }
+    });
+  } catch (error) {
+    console.error('Login error:', error);
+    res.status(500).json({ error: 'Failed to log in. Please try again.' });
+  }
+});
+
+// Quick 1-Click Demo Login (creates or finds demo account)
+router.post('/demo', (req, res) => {
+  try {
+    let manager = db.prepare('SELECT * FROM managers WHERE username = ?').get('admin');
+    if (!manager) {
+      const salt = bcrypt.genSaltSync(10);
+      const password_hash = bcrypt.hashSync('admin123', salt);
+      const result = db.prepare(`
+        INSERT INTO managers (username, password_hash, name)
+        VALUES ('admin', ?, 'Queue Administrator')
+      `).run(password_hash);
+      const id = Number(result.lastInsertRowid);
+      manager = { id, username: 'admin', name: 'Queue Administrator' };
+    }
+
+    const token = jwt.sign(
+      { id: manager.id, username: manager.username, name: manager.name },
+      JWT_SECRET,
+      { expiresIn: '7d' }
+    );
+
+    res.json({
+      message: 'Demo login successful',
+      token,
+      manager: { id: manager.id, username: manager.username, name: manager.name }
+    });
+  } catch (error) {
+    console.error('Demo login error:', error);
+    res.status(500).json({ error: 'Failed to authenticate demo account.' });
+  }
+});
+
+// Current manager session check
+router.get('/me', authenticateToken, (req, res) => {
+  try {
+    const manager = db.prepare('SELECT id, username, name, created_at FROM managers WHERE id = ?').get(req.manager.id);
+    if (!manager) {
+      return res.status(404).json({ error: 'Manager not found.' });
+    }
+    res.json({ manager });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch manager profile.' });
+  }
+});
+
+module.exports = router;
