@@ -42,15 +42,20 @@ async function request(url, options = {}) {
 
     if (!response.ok) {
       const errorMsg = data.error || data.message || `Request failed with status ${response.status}`;
-      throw new Error(errorMsg);
+      const apiErr = new Error(errorMsg);
+      apiErr.isApiError = true;
+      apiErr.status = response.status;
+      throw apiErr;
     }
 
     return data;
   } catch (err) {
+    if (err.isApiError) {
+      throw err;
+    }
     if (
       err.message === 'STATIC_HOSTING' ||
       err.name === 'TypeError' ||
-      err.message?.includes('404') ||
       err.message?.includes('Failed to fetch') ||
       err.message?.includes('NetworkError')
     ) {
@@ -66,11 +71,14 @@ function withFallback(apiCall, fallbackCall) {
     try {
       return await apiCall(...args);
     } catch (err) {
+      // Never swallow explicit API authentication or validation errors
+      if (err.isApiError) {
+        throw err;
+      }
       if (
         isStaticHosting ||
         err.message === 'STATIC_HOSTING' ||
         err.name === 'TypeError' ||
-        err.message?.includes('404') ||
         err.message?.includes('Failed to fetch') ||
         err.message?.includes('NetworkError')
       ) {
@@ -85,19 +93,19 @@ export const api = {
   // Auth
   login: withFallback(
     (username, password) => request('/auth/login', { method: 'POST', body: JSON.stringify({ username, password }) }),
-    (username) => mockStorage.login(username)
+    (username, password) => mockStorage.login(username, password)
   ),
   register: withFallback(
     (username, password, name) => request('/auth/register', { method: 'POST', body: JSON.stringify({ username, password, name }) }),
-    (username) => mockStorage.login(username)
+    (username, password, name) => mockStorage.register(username, password, name)
   ),
   demoLogin: withFallback(
     () => request('/auth/demo', { method: 'POST' }),
-    () => mockStorage.login('admin')
+    () => mockStorage.login('admin', 'admin123')
   ),
   loginWithGoogle: withFallback(
     (payload) => request('/auth/google', { method: 'POST', body: JSON.stringify(payload || {}) }),
-    (payload) => mockStorage.loginWithGoogle(payload?.email, payload?.name)
+    (payload) => mockStorage.loginWithGoogle(payload)
   ),
   getCurrentUser: withFallback(
     () => request('/auth/me'),

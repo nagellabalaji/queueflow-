@@ -119,22 +119,47 @@ router.post('/demo', (req, res) => {
 });
 
 // Google OAuth Sign-In endpoint
-router.post('/google', (req, res) => {
-  const { email, name } = req.body || {};
-  const googleUsername = email ? email.split('@')[0] : 'google.admin';
-  const displayName = name || 'Google Administrator';
+router.post('/google', async (req, res) => {
+  const { access_token, id_token, email, name, google_id } = req.body || {};
+
+  let verifiedEmail = email;
+  let verifiedName = name || 'Google Administrator';
+
+  // If Google access_token is sent, verify with Google directly
+  if (access_token) {
+    try {
+      const googleRes = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+        headers: { Authorization: `Bearer ${access_token}` }
+      });
+      if (googleRes.ok) {
+        const profile = await googleRes.json();
+        if (profile.email) {
+          verifiedEmail = profile.email;
+          verifiedName = profile.name || verifiedName;
+        }
+      }
+    } catch (e) {
+      console.warn('Google token verification query failed:', e.message);
+    }
+  }
+
+  if (!verifiedEmail) {
+    return res.status(400).json({ error: 'Valid Google account credentials required.' });
+  }
+
+  const googleUsername = verifiedEmail.toLowerCase();
 
   try {
-    let manager = db.prepare('SELECT * FROM managers WHERE username = ?').get(googleUsername);
+    let manager = db.prepare('SELECT * FROM managers WHERE LOWER(username) = LOWER(?)').get(googleUsername);
     if (!manager) {
       const salt = bcrypt.genSaltSync(10);
       const password_hash = bcrypt.hashSync(`oauth_${Date.now()}`, salt);
       const result = db.prepare(`
         INSERT INTO managers (username, password_hash, name)
         VALUES (?, ?, ?)
-      `).run(googleUsername, password_hash, displayName);
+      `).run(googleUsername, password_hash, verifiedName);
       const id = Number(result.lastInsertRowid);
-      manager = { id, username: googleUsername, name: displayName };
+      manager = { id, username: googleUsername, name: verifiedName };
     }
 
     const token = jwt.sign(

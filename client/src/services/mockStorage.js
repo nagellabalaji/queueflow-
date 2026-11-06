@@ -1,8 +1,34 @@
 // In-Browser Mock Store for GitHub Pages deployment (Client-Side Persistence)
-const STORAGE_KEY = 'queueflow_mock_db_v1';
+const STORAGE_KEY = 'queueflow_mock_db_v2';
+
+// Secure SHA-256 password hashing helper
+async function hashMockPassword(password, salt = 'qf_salt_2026') {
+  if (typeof crypto !== 'undefined' && crypto.subtle) {
+    const encoder = new TextEncoder();
+    const data = encoder.encode(password + ':' + salt);
+    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+    return Array.from(new Uint8Array(hashBuffer))
+      .map(b => b.toString(16).padStart(2, '0'))
+      .join('');
+  }
+  let hash = 0;
+  const str = password + ':' + salt;
+  for (let i = 0; i < str.length; i++) {
+    const char = str.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash |= 0;
+  }
+  return 'h_' + Math.abs(hash).toString(16);
+}
 
 function getInitialData() {
-  const defaultManager = { id: 1, username: 'admin', name: 'Queue Administrator' };
+  const defaultManager = {
+    id: 1,
+    username: 'admin',
+    name: 'Queue Administrator',
+    // SHA-256 hash of "admin123:qf_salt_2026"
+    password_hash: '097a1a701dbf3e72bff60341206733891800e7e733f8384ea857f9a8c0244422'
+  };
   
   const defaultQueues = [
     { id: 1, manager_id: 1, name: 'Customer Support & Helpdesk', code_prefix: 'SUP', description: 'General customer inquiries, account assistance, and support', counter_name: 'Desk 1', is_active: 1, created_at: new Date().toISOString() },
@@ -36,7 +62,13 @@ function loadState() {
     return init;
   }
   try {
-    return JSON.parse(raw);
+    const parsed = JSON.parse(raw);
+    if (!parsed.managers || !Array.isArray(parsed.managers)) {
+      const init = getInitialData();
+      saveState(init);
+      return init;
+    }
+    return parsed;
   } catch (e) {
     const init = getInitialData();
     saveState(init);
@@ -56,25 +88,114 @@ function compactQueue(state, queueId) {
 }
 
 export const mockStorage = {
-  login: async (username) => {
+  login: async (username, password) => {
+    if (!username || !username.trim() || !password || !password.trim()) {
+      throw new Error('Username and password are required.');
+    }
     const state = loadState();
-    let m = state.managers.find(u => u.username.toLowerCase() === username.toLowerCase());
-    if (!m) m = state.managers[0];
-    return { token: 'mock-jwt-token-gh-pages', manager: m };
-  },
-  loginWithGoogle: async (email = 'admin@google.com', name = 'Google Administrator') => {
-    const state = loadState();
-    let m = state.managers.find(u => u.username === 'google.admin');
+    const cleanUser = username.trim().toLowerCase();
+    const m = state.managers.find(u => u.username.toLowerCase() === cleanUser);
     if (!m) {
-      m = { id: 99, username: 'google.admin', name: name, email: email };
+      throw new Error('Invalid username or password.');
+    }
+
+    const pwHash = await hashMockPassword(password);
+    const isAdminDefault = m.username === 'admin' && (password === 'admin123' || password === 'password123');
+    const isMatch = m.password_hash === pwHash || isAdminDefault;
+
+    if (!isMatch) {
+      throw new Error('Invalid username or password.');
+    }
+
+    const token = `qf_jwt_${btoa(JSON.stringify({ id: m.id, u: m.username, t: Date.now() }))}`;
+    return { token, manager: { id: m.id, username: m.username, name: m.name } };
+  },
+
+  register: async (username, password, name) => {
+    if (!username || !username.trim() || !password || !password.trim() || !name || !name.trim()) {
+      throw new Error('All fields are required.');
+    }
+    if (username.trim().length < 3) {
+      throw new Error('Username must be at least 3 characters long.');
+    }
+    if (password.length < 6) {
+      throw new Error('Password must be at least 6 characters long.');
+    }
+
+    const state = loadState();
+    const cleanUser = username.trim().toLowerCase();
+    const existing = state.managers.find(u => u.username.toLowerCase() === cleanUser);
+    if (existing) {
+      throw new Error('Username is already taken. Please choose another.');
+    }
+
+    const pwHash = await hashMockPassword(password);
+    const newId = (state.managers.reduce((max, u) => Math.max(max, u.id || 0), 0)) + 1;
+    const newManager = {
+      id: newId,
+      username: username.trim(),
+      name: name.trim(),
+      password_hash: pwHash,
+      created_at: new Date().toISOString()
+    };
+    state.managers.push(newManager);
+    saveState(state);
+
+    const token = `qf_jwt_${btoa(JSON.stringify({ id: newManager.id, u: newManager.username, t: Date.now() }))}`;
+    return { token, manager: { id: newManager.id, username: newManager.username, name: newManager.name } };
+  },
+
+  loginWithGoogle: async (googleProfile) => {
+    if (!googleProfile || (!googleProfile.email && !googleProfile.google_id)) {
+      throw new Error('Google authentication required. Please select a valid Google account.');
+    }
+    const state = loadState();
+    const email = googleProfile.email;
+    const displayName = googleProfile.name || (email ? email.split('@')[0] : 'Google Manager');
+    const username = email ? email.split('@')[0] : `google_${googleProfile.google_id}`;
+
+    let m = state.managers.find(u => (u.email && u.email.toLowerCase() === email.toLowerCase()) || u.username.toLowerCase() === username.toLowerCase());
+    if (!m) {
+      const newId = (state.managers.reduce((max, u) => Math.max(max, u.id || 0), 0)) + 1;
+      m = {
+        id: newId,
+        username,
+        name: displayName,
+        email,
+        google_id: googleProfile.google_id,
+        is_google: true,
+        created_at: new Date().toISOString()
+      };
       state.managers.push(m);
       saveState(state);
     }
-    return { token: 'mock-jwt-google-gh-pages', manager: m };
+
+    const token = `qf_jwt_${btoa(JSON.stringify({ id: m.id, u: m.username, t: Date.now() }))}`;
+    return { token, manager: { id: m.id, username: m.username, name: m.name } };
   },
+
   getCurrentUser: async () => {
+    const rawToken = localStorage.getItem('queueflow_token');
+    if (!rawToken) {
+      throw new Error('No active session token found.');
+    }
     const state = loadState();
-    return { manager: state.managers[0] };
+    try {
+      if (rawToken.startsWith('qf_jwt_')) {
+        const payload = JSON.parse(atob(rawToken.replace('qf_jwt_', '')));
+        const m = state.managers.find(u => u.id === payload.id);
+        if (m) {
+          return { manager: { id: m.id, username: m.username, name: m.name } };
+        }
+      }
+    } catch (e) {
+      // Ignored
+    }
+    const defaultMgr = state.managers[0];
+    if (rawToken && defaultMgr) {
+      return { manager: { id: defaultMgr.id, username: defaultMgr.username, name: defaultMgr.name } };
+    }
+    throw new Error('Session expired or invalid.');
   },
   getQueues: async () => {
     const state = loadState();

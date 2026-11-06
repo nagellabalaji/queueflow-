@@ -137,10 +137,13 @@ def demo_login():
 
 @app.post("/api/auth/google")
 def google_login(payload: dict = None):
+    if not payload or not (payload.get("email") or payload.get("access_token")):
+        raise HTTPException(status_code=400, detail="Google authentication required")
+
     conn = get_db()
-    email = payload.get("email") if payload else None
-    display_name = payload.get("name") if payload else "Google Administrator"
-    username = email.split("@")[0] if email else "google.admin"
+    email = payload.get("email")
+    display_name = payload.get("name") or "Google Administrator"
+    username = email.lower() if email else f"google_{payload.get('google_id', 'user')}"
 
     manager = conn.execute("SELECT * FROM managers WHERE username = ?", (username,)).fetchone()
     if not manager:
