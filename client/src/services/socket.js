@@ -1,15 +1,24 @@
 import { io } from 'socket.io-client';
 
 let socketInstance = null;
+const isStaticHosting = typeof window !== 'undefined' && window.location.hostname.includes('github.io');
 
 export function getSocket() {
+  if (isStaticHosting) {
+    return {
+      emit: () => {},
+      on: () => {},
+      off: () => {}
+    };
+  }
+
   if (!socketInstance) {
     socketInstance = io(window.location.origin, {
       path: '/socket.io',
       transports: ['websocket', 'polling'],
       autoConnect: true,
-      reconnectionAttempts: 10,
-      reconnectionDelay: 1000
+      reconnectionAttempts: 5,
+      reconnectionDelay: 2000
     });
 
     socketInstance.on('connect', () => {
@@ -25,6 +34,10 @@ export function getSocket() {
 }
 
 export function subscribeToQueue(queueId, callback) {
+  if (isStaticHosting) {
+    return () => {};
+  }
+
   const socket = getSocket();
   socket.emit('join_queue', queueId);
 
