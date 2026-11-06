@@ -99,11 +99,11 @@ def init_db():
             q_id = sup_q["id"]
             now = datetime.utcnow()
             
-            # Completed tokens for analytics
+            # Completed tokens for analytics & recent queue
             completed_samples = [
-                ("Sarah Jenkins", "+1-555-0101", "NORMAL", 320, 410, 5),
-                ("Michael Chang", "+1-555-0102", "PRIORITY", 180, 350, 4),
-                ("Emily Rodriguez", "+1-555-0103", "NORMAL", 450, 520, 3)
+                ("Balaji", "+91 98480 12345", "NORMAL", 320, 410, 5),
+                ("Sainadh", "+91 98480 23456", "PRIORITY", 180, 350, 4),
+                ("Pavan", "+91 98480 34567", "NORMAL", 450, 520, 3)
             ]
             num = 1
             for name, phone, prio, wait, serv, h_ago in completed_samples:
@@ -119,16 +119,17 @@ def init_db():
             # Serving token
             cursor.execute("""
                 INSERT INTO tokens (queue_id, token_number, token_code, customer_name, customer_phone, priority, status, position, created_at, service_started_at, wait_duration_seconds, counter_assigned)
-                VALUES (?, ?, ?, 'Eleanor Vance', '+1-555-0145', 'PRIORITY', 'IN_SERVICE', NULL, ?, ?, 600, 'Desk 1')
+                VALUES (?, ?, ?, 'Teja', '+91 98480 45678', 'PRIORITY', 'IN_SERVICE', NULL, ?, ?, 600, 'Desk 1')
             """, (q_id, num, f"SUP-{num:03d}", (now - timedelta(minutes=15)).strftime('%Y-%m-%d %H:%M:%S'), (now - timedelta(minutes=5)).strftime('%Y-%m-%d %H:%M:%S')))
             num += 1
 
             # Waiting tokens
             waiting_samples = [
-                ("Alexander Wright", "+1-555-0210", "VIP"),
-                ("Olivia Martin", "+1-555-0211", "NORMAL"),
-                ("Lucas Scott", "+1-555-0212", "NORMAL"),
-                ("Sophia Bennett", "+1-555-0213", "PRIORITY")
+                ("Nani", "+91 98480 56789", "VIP"),
+                ("Rahul", "+91 98480 67890", "NORMAL"),
+                ("Srinu", "+91 98480 78901", "NORMAL"),
+                ("Mohan Sai", "+91 98480 89012", "PRIORITY"),
+                ("Gopi", "+91 98480 90123", "NORMAL")
             ]
             for idx, (name, phone, prio) in enumerate(waiting_samples):
                 cursor.execute("""

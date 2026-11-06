@@ -218,7 +218,7 @@ export default function LoginModal() {
               <div>
                 <span className="text-[10px] uppercase font-bold tracking-wider text-[#64748B]">Now Serving</span>
                 <div className="font-mono text-2xl font-black text-[#2563EB]">SUP-004</div>
-                <div className="text-xs text-[#1E293B] font-semibold">Eleanor Vance</div>
+                <div className="text-xs text-[#1E293B] font-semibold">Teja</div>
               </div>
               <div className="text-right">
                 <span className="text-[10px] text-[#64748B] uppercase font-bold tracking-wider">Service Elapsed</span>

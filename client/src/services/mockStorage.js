@@ -1,5 +1,5 @@
 // In-Browser Mock Store for GitHub Pages deployment (Client-Side Persistence)
-const STORAGE_KEY = 'queueflow_mock_db_v2';
+const STORAGE_KEY = 'queueflow_mock_db_v3';
 
 // Secure SHA-256 password hashing helper
 async function hashMockPassword(password, salt = 'qf_salt_2026') {
@@ -38,24 +38,37 @@ function getInitialData() {
 
   const now = Date.now();
   const defaultTokens = [
-    // Historical completed for analytics
-    { id: 1, queue_id: 1, token_number: 1, token_code: 'SUP-001', customer_name: 'Sarah Jenkins', customer_phone: '+1-555-0101', priority: 'NORMAL', status: 'COMPLETED', position: null, created_at: new Date(now - 5 * 3600 * 1000).toISOString(), service_started_at: new Date(now - 4.9 * 3600 * 1000).toISOString(), service_ended_at: new Date(now - 4.8 * 3600 * 1000).toISOString(), wait_duration_seconds: 320, service_duration_seconds: 410, cancellation_reason: null, counter_assigned: 'Desk 1' },
-    { id: 2, queue_id: 1, token_number: 2, token_code: 'SUP-002', customer_name: 'Michael Chang', customer_phone: '+1-555-0102', priority: 'PRIORITY', status: 'COMPLETED', position: null, created_at: new Date(now - 4 * 3600 * 1000).toISOString(), service_started_at: new Date(now - 3.9 * 3600 * 1000).toISOString(), service_ended_at: new Date(now - 3.8 * 3600 * 1000).toISOString(), wait_duration_seconds: 180, service_duration_seconds: 350, cancellation_reason: null, counter_assigned: 'Desk 1' },
-    { id: 3, queue_id: 1, token_number: 3, token_code: 'SUP-003', customer_name: 'Thomas Wayne', customer_phone: '+1-555-0199', priority: 'NORMAL', status: 'CANCELLED', position: null, created_at: new Date(now - 3 * 3600 * 1000).toISOString(), service_started_at: null, service_ended_at: new Date(now - 2.8 * 3600 * 1000).toISOString(), wait_duration_seconds: null, service_duration_seconds: null, cancellation_reason: 'Customer left queue / No-show', counter_assigned: null },
-    // In Service
-    { id: 4, queue_id: 1, token_number: 4, token_code: 'SUP-004', customer_name: 'Eleanor Vance', customer_phone: '+1-555-0145', priority: 'PRIORITY', status: 'IN_SERVICE', position: null, created_at: new Date(now - 15 * 60 * 1000).toISOString(), service_started_at: new Date(now - 4 * 60 * 1000).toISOString(), service_ended_at: null, wait_duration_seconds: 660, service_duration_seconds: null, cancellation_reason: null, counter_assigned: 'Desk 1' },
+    // Historical completed for analytics & recent queue history
+    { id: 1, queue_id: 1, token_number: 1, token_code: 'SUP-001', customer_name: 'Balaji', customer_phone: '+91 98480 12345', priority: 'NORMAL', status: 'COMPLETED', position: null, created_at: new Date(now - 5 * 3600 * 1000).toISOString(), service_started_at: new Date(now - 4.9 * 3600 * 1000).toISOString(), service_ended_at: new Date(now - 4.8 * 3600 * 1000).toISOString(), wait_duration_seconds: 320, service_duration_seconds: 410, cancellation_reason: null, counter_assigned: 'Desk 1' },
+    { id: 2, queue_id: 1, token_number: 2, token_code: 'SUP-002', customer_name: 'Sainadh', customer_phone: '+91 98480 23456', priority: 'PRIORITY', status: 'COMPLETED', position: null, created_at: new Date(now - 4 * 3600 * 1000).toISOString(), service_started_at: new Date(now - 3.9 * 3600 * 1000).toISOString(), service_ended_at: new Date(now - 3.8 * 3600 * 1000).toISOString(), wait_duration_seconds: 180, service_duration_seconds: 350, cancellation_reason: null, counter_assigned: 'Desk 1' },
+    { id: 3, queue_id: 1, token_number: 3, token_code: 'SUP-003', customer_name: 'Pavan', customer_phone: '+91 98480 34567', priority: 'NORMAL', status: 'CANCELLED', position: null, created_at: new Date(now - 3 * 3600 * 1000).toISOString(), service_started_at: null, service_ended_at: new Date(now - 2.8 * 3600 * 1000).toISOString(), wait_duration_seconds: null, service_duration_seconds: null, cancellation_reason: 'Customer request resolved without counter service', counter_assigned: null },
+    // In Service / Now Serving
+    { id: 4, queue_id: 1, token_number: 4, token_code: 'SUP-004', customer_name: 'Teja', customer_phone: '+91 98480 45678', priority: 'PRIORITY', status: 'IN_SERVICE', position: null, created_at: new Date(now - 15 * 60 * 1000).toISOString(), service_started_at: new Date(now - 4 * 60 * 1000).toISOString(), service_ended_at: null, wait_duration_seconds: 660, service_duration_seconds: null, cancellation_reason: null, counter_assigned: 'Desk 1' },
     // Waiting Tokens
-    { id: 5, queue_id: 1, token_number: 5, token_code: 'SUP-005', customer_name: 'Alexander Wright', customer_phone: '+1-555-0210', priority: 'VIP', status: 'WAITING', position: 1, created_at: new Date(now - 10 * 60 * 1000).toISOString(), service_started_at: null, service_ended_at: null, wait_duration_seconds: null, service_duration_seconds: null, cancellation_reason: null, counter_assigned: null },
-    { id: 6, queue_id: 1, token_number: 6, token_code: 'SUP-006', customer_name: 'Olivia Martin', customer_phone: '+1-555-0211', priority: 'NORMAL', status: 'WAITING', position: 2, created_at: new Date(now - 8 * 60 * 1000).toISOString(), service_started_at: null, service_ended_at: null, wait_duration_seconds: null, service_duration_seconds: null, cancellation_reason: null, counter_assigned: null },
-    { id: 7, queue_id: 1, token_number: 7, token_code: 'SUP-007', customer_name: 'Lucas Scott', customer_phone: '+1-555-0212', priority: 'NORMAL', status: 'WAITING', position: 3, created_at: new Date(now - 5 * 60 * 1000).toISOString(), service_started_at: null, service_ended_at: null, wait_duration_seconds: null, service_duration_seconds: null, cancellation_reason: null, counter_assigned: null },
-    { id: 8, queue_id: 1, token_number: 8, token_code: 'SUP-008', customer_name: 'Sophia Bennett', customer_phone: '+1-555-0213', priority: 'PRIORITY', status: 'WAITING', position: 4, created_at: new Date(now - 2 * 60 * 1000).toISOString(), service_started_at: null, service_ended_at: null, wait_duration_seconds: null, service_duration_seconds: null, cancellation_reason: null, counter_assigned: null }
+    { id: 5, queue_id: 1, token_number: 5, token_code: 'SUP-005', customer_name: 'Nani', customer_phone: '+91 98480 56789', priority: 'VIP', status: 'WAITING', position: 1, created_at: new Date(now - 10 * 60 * 1000).toISOString(), service_started_at: null, service_ended_at: null, wait_duration_seconds: null, service_duration_seconds: null, cancellation_reason: null, counter_assigned: null },
+    { id: 6, queue_id: 1, token_number: 6, token_code: 'SUP-006', customer_name: 'Rahul', customer_phone: '+91 98480 67890', priority: 'NORMAL', status: 'WAITING', position: 2, created_at: new Date(now - 8 * 60 * 1000).toISOString(), service_started_at: null, service_ended_at: null, wait_duration_seconds: null, service_duration_seconds: null, cancellation_reason: null, counter_assigned: null },
+    { id: 7, queue_id: 1, token_number: 7, token_code: 'SUP-007', customer_name: 'Srinu', customer_phone: '+91 98480 78901', priority: 'NORMAL', status: 'WAITING', position: 3, created_at: new Date(now - 5 * 60 * 1000).toISOString(), service_started_at: null, service_ended_at: null, wait_duration_seconds: null, service_duration_seconds: null, cancellation_reason: null, counter_assigned: null },
+    { id: 8, queue_id: 1, token_number: 8, token_code: 'SUP-008', customer_name: 'Mohan Sai', customer_phone: '+91 98480 89012', priority: 'PRIORITY', status: 'WAITING', position: 4, created_at: new Date(now - 2 * 60 * 1000).toISOString(), service_started_at: null, service_ended_at: null, wait_duration_seconds: null, service_duration_seconds: null, cancellation_reason: null, counter_assigned: null },
+    { id: 9, queue_id: 1, token_number: 9, token_code: 'SUP-009', customer_name: 'Gopi', customer_phone: '+91 98480 90123', priority: 'NORMAL', status: 'WAITING', position: 5, created_at: new Date(now - 1 * 60 * 1000).toISOString(), service_started_at: null, service_ended_at: null, wait_duration_seconds: null, service_duration_seconds: null, cancellation_reason: null, counter_assigned: null }
   ];
 
   return { managers: [defaultManager], queues: defaultQueues, tokens: defaultTokens };
 }
 
 function loadState() {
-  const raw = localStorage.getItem(STORAGE_KEY);
+  const NAME_MAPPING = {
+    'Sarah Jenkins': 'Balaji',
+    'Michael Chang': 'Sainadh',
+    'Thomas Wayne': 'Pavan',
+    'Eleanor Vance': 'Teja',
+    'Alexander Wright': 'Nani',
+    'Olivia Martin': 'Rahul',
+    'Lucas Scott': 'Srinu',
+    'Sophia Bennett': 'Mohan Sai',
+    'Ethan Cooper': 'Gopi'
+  };
+
+  const raw = localStorage.getItem(STORAGE_KEY) || localStorage.getItem('queueflow_mock_db_v2');
   if (!raw) {
     const init = getInitialData();
     saveState(init);
@@ -63,10 +76,29 @@ function loadState() {
   }
   try {
     const parsed = JSON.parse(raw);
-    if (!parsed.managers || !Array.isArray(parsed.managers)) {
+    if (!parsed.managers || !Array.isArray(parsed.managers) || !parsed.tokens || !Array.isArray(parsed.tokens)) {
       const init = getInitialData();
       saveState(init);
       return init;
+    }
+    // Migrate any legacy names if present
+    let modified = false;
+    parsed.tokens.forEach(t => {
+      if (NAME_MAPPING[t.customer_name]) {
+        t.customer_name = NAME_MAPPING[t.customer_name];
+        modified = true;
+      }
+    });
+    // Check if SUP-009 (Gopi) needs to be added
+    if (!parsed.tokens.some(t => t.customer_name.toLowerCase() === 'gopi')) {
+      const now = Date.now();
+      parsed.tokens.push({
+        id: 9, queue_id: 1, token_number: 9, token_code: 'SUP-009', customer_name: 'Gopi', customer_phone: '+91 98480 90123', priority: 'NORMAL', status: 'WAITING', position: 5, created_at: new Date(now - 1 * 60 * 1000).toISOString(), service_started_at: null, service_ended_at: null, wait_duration_seconds: null, service_duration_seconds: null, cancellation_reason: null, counter_assigned: null
+      });
+      modified = true;
+    }
+    if (modified || !localStorage.getItem(STORAGE_KEY)) {
+      saveState(parsed);
     }
     return parsed;
   } catch (e) {

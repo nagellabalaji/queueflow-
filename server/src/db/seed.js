@@ -58,12 +58,8 @@ if (tokenCount === 0) {
 
   // Historical completed tokens for SUP queue (spread across hours for analytics)
   const completedData = [
-    { name: 'Sarah Jenkins', phone: '+1-555-0101', priority: 'NORMAL', wait: 320, service: 410, hoursAgo: 5 },
-    { name: 'Michael Chang', phone: '+1-555-0102', priority: 'PRIORITY', wait: 180, service: 350, hoursAgo: 4 },
-    { name: 'Emily Rodriguez', phone: '+1-555-0103', priority: 'NORMAL', wait: 450, service: 520, hoursAgo: 4 },
-    { name: 'David Kim', phone: '+1-555-0104', priority: 'VIP', wait: 120, service: 600, hoursAgo: 3 },
-    { name: 'Jessica Taylor', phone: '+1-555-0105', priority: 'NORMAL', wait: 390, service: 300, hoursAgo: 2 },
-    { name: 'Robert Johnson', phone: '+1-555-0106', priority: 'NORMAL', wait: 280, service: 440, hoursAgo: 1 }
+    { name: 'Balaji', phone: '+91 98480 12345', priority: 'NORMAL', wait: 320, service: 410, hoursAgo: 5 },
+    { name: 'Sainadh', phone: '+91 98480 23456', priority: 'PRIORITY', wait: 180, service: 350, hoursAgo: 4 }
   ];
 
   let tokenNum = 1;
@@ -92,13 +88,13 @@ if (tokenCount === 0) {
     tokenNum++;
   });
 
-  // Cancelled token for realistic analytics
+  // Cancelled token for realistic analytics & recent queue
   insertToken.run(
     supQueue.id,
     tokenNum,
     `SUP-${String(tokenNum).padStart(3, '0')}`,
-    'Thomas Wayne',
-    '+1-555-0199',
+    'Pavan',
+    '+91 98480 34567',
     'NORMAL',
     'CANCELLED',
     null,
@@ -107,7 +103,7 @@ if (tokenCount === 0) {
     new Date(Date.now() - 2 * 3600 * 1000).toISOString().replace('T', ' ').substring(0, 19),
     null,
     null,
-    'Customer left premise before call',
+    'Customer request resolved without counter service',
     null
   );
   tokenNum++;
@@ -117,8 +113,8 @@ if (tokenCount === 0) {
     supQueue.id,
     tokenNum,
     `SUP-${String(tokenNum).padStart(3, '0')}`,
-    'Eleanor Vance',
-    '+1-555-0145',
+    'Teja',
+    '+91 98480 45678',
     'PRIORITY',
     'IN_SERVICE',
     null,
@@ -134,11 +130,11 @@ if (tokenCount === 0) {
 
   // WAITING tokens for SUP queue
   const waitingPersons = [
-    { name: 'Alexander Wright', phone: '+1-555-0210', priority: 'VIP' },
-    { name: 'Olivia Martin', phone: '+1-555-0211', priority: 'NORMAL' },
-    { name: 'Lucas Scott', phone: '+1-555-0212', priority: 'NORMAL' },
-    { name: 'Sophia Bennett', phone: '+1-555-0213', priority: 'PRIORITY' },
-    { name: 'Ethan Cooper', phone: '+1-555-0214', priority: 'NORMAL' }
+    { name: 'Nani', phone: '+91 98480 56789', priority: 'VIP' },
+    { name: 'Rahul', phone: '+91 98480 67890', priority: 'NORMAL' },
+    { name: 'Srinu', phone: '+91 98480 78901', priority: 'NORMAL' },
+    { name: 'Mohan Sai', phone: '+91 98480 89012', priority: 'PRIORITY' },
+    { name: 'Gopi', phone: '+91 98480 90123', priority: 'NORMAL' }
   ];
 
   waitingPersons.forEach((person, idx) => {
