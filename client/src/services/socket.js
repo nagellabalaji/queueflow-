@@ -1,7 +1,13 @@
 import { io } from 'socket.io-client';
 
 let socketInstance = null;
-const isStaticHosting = typeof window !== 'undefined' && window.location.hostname.includes('github.io');
+const isStaticHosting = typeof window !== 'undefined' && (
+  window.location.hostname.includes('github.io') ||
+  window.location.hostname.includes('pages.dev') ||
+  window.location.hostname.includes('netlify.app') ||
+  window.location.hostname.includes('vercel.app') ||
+  window.location.protocol === 'file:'
+);
 
 export function getSocket() {
   if (isStaticHosting) {

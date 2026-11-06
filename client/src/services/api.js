@@ -2,8 +2,14 @@ import { mockStorage } from './mockStorage';
 
 const API_BASE = '/api';
 
-// Detect if running on GitHub Pages (static hosting with no Node.js backend)
-const isStaticHosting = window.location.hostname.includes('github.io');
+// Detect if running on static hosting with no Node.js backend
+const isStaticHosting = typeof window !== 'undefined' && (
+  window.location.hostname.includes('github.io') ||
+  window.location.hostname.includes('pages.dev') ||
+  window.location.hostname.includes('netlify.app') ||
+  window.location.hostname.includes('vercel.app') ||
+  window.location.protocol === 'file:'
+);
 
 function getAuthHeader() {
   const token = localStorage.getItem('queueflow_token');
@@ -41,8 +47,14 @@ async function request(url, options = {}) {
 
     return data;
   } catch (err) {
-    if (err.message === 'STATIC_HOSTING' || err.name === 'TypeError') {
-      throw err;
+    if (
+      err.message === 'STATIC_HOSTING' ||
+      err.name === 'TypeError' ||
+      err.message?.includes('404') ||
+      err.message?.includes('Failed to fetch') ||
+      err.message?.includes('NetworkError')
+    ) {
+      throw new Error('STATIC_HOSTING');
     }
     throw err;
   }
@@ -54,7 +66,14 @@ function withFallback(apiCall, fallbackCall) {
     try {
       return await apiCall(...args);
     } catch (err) {
-      if (isStaticHosting || err.message === 'STATIC_HOSTING' || err.name === 'TypeError') {
+      if (
+        isStaticHosting ||
+        err.message === 'STATIC_HOSTING' ||
+        err.name === 'TypeError' ||
+        err.message?.includes('404') ||
+        err.message?.includes('Failed to fetch') ||
+        err.message?.includes('NetworkError')
+      ) {
         return await fallbackCall(...args);
       }
       throw err;
