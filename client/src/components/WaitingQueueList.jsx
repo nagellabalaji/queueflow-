@@ -167,7 +167,7 @@ export default function WaitingQueueList({
                   </div>
 
                   {/* Token Code */}
-                  <div className="shrink-0 font-mono text-xs sm:text-sm font-black text-[#243447] px-2.5 py-1 bg-white border border-[#E5E3DC] rounded-lg">
+                  <div className="shrink-0 font-mono text-xs sm:text-sm font-black text-[#243447] px-2.5 py-1 bg-white border border-[#E5E3DC] rounded-lg whitespace-nowrap">
                     {token.token_code}
                   </div>
 
