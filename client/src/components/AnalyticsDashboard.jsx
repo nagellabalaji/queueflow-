@@ -69,33 +69,33 @@ export default function AnalyticsDashboard({ queues }) {
   };
 
   return (
-    <div className="space-y-6 animate-fade-in">
-      {/* Top Controls & Filters */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 bg-slate-900 border border-slate-800 rounded-2xl">
+    <div className="space-y-4 sm:space-y-6 animate-fade-in">
+      {/* Top Controls & Filters (Mobile Responsive) */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 sm:p-4 bg-slate-900 border border-slate-800 rounded-2xl">
         <div>
-          <h2 className="text-xl font-bold text-white tracking-tight flex items-center gap-2">
-            <TrendingUp className="w-5 h-5 text-indigo-400" />
-            <span>Queue Performance & Analytics</span>
+          <h2 className="text-lg sm:text-xl font-bold text-white tracking-tight flex items-center gap-2">
+            <TrendingUp className="w-5 h-5 text-indigo-400 shrink-0" />
+            <span>Queue Analytics</span>
           </h2>
-          <p className="text-xs text-slate-400 mt-0.5">
-            Real-time analytics on wait times, queue traffic, and operational throughput
+          <p className="text-[11px] sm:text-xs text-slate-400 mt-0.5">
+            Real-time metrics on wait times, queue traffic, and throughput
           </p>
         </div>
 
-        <div className="flex items-center flex-wrap gap-2.5">
+        <div className="flex flex-col xs:flex-row items-stretch sm:items-center gap-2">
           {/* Period selector */}
-          <div className="flex items-center bg-slate-950 p-1 rounded-xl border border-slate-800 text-xs">
+          <div className="flex items-center justify-between bg-slate-950 p-1 rounded-xl border border-slate-800 text-xs">
             {['today', 'week', 'all'].map((p) => (
               <button
                 key={p}
                 onClick={() => setPeriod(p)}
-                className={`px-3 py-1.5 rounded-lg font-medium capitalize transition-all ${
+                className={`flex-1 sm:flex-none px-2.5 sm:px-3 py-1.5 rounded-lg font-medium capitalize text-center transition-all ${
                   period === p
                     ? 'bg-indigo-600 text-white shadow-sm'
                     : 'text-slate-400 hover:text-white'
                 }`}
               >
-                {p === 'today' ? 'Today' : p === 'week' ? 'Past 7 Days' : 'All Time'}
+                {p === 'today' ? 'Today' : p === 'week' ? '7 Days' : 'All Time'}
               </button>
             ))}
           </div>
@@ -104,9 +104,9 @@ export default function AnalyticsDashboard({ queues }) {
           <select
             value={selectedQueue}
             onChange={(e) => setSelectedQueue(e.target.value)}
-            className="bg-slate-950 border border-slate-800 rounded-xl px-3 py-1.5 text-xs text-slate-300 focus:outline-none focus:border-indigo-500 font-medium"
+            className="bg-slate-950 border border-slate-800 rounded-xl px-3 py-1.5 text-xs text-slate-300 focus:outline-none focus:border-indigo-500 font-medium w-full sm:w-auto"
           >
-            <option value="">All Queues Combined</option>
+            <option value="">All Queues</option>
             {queues.map((q) => (
               <option key={q.id} value={q.id}>
                 {q.name} ({q.code_prefix})
@@ -116,97 +116,95 @@ export default function AnalyticsDashboard({ queues }) {
         </div>
       </div>
 
-      {/* KPI Stat Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      {/* KPI Stat Cards (2x2 on mobile, 4 in row on desktop) */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4">
         {/* Total Handled */}
-        <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 sm:p-5 relative overflow-hidden">
+        <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-3.5 sm:p-5 relative overflow-hidden">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Total Volume</span>
-            <div className="w-8 h-8 rounded-xl bg-indigo-600/10 border border-indigo-500/20 text-indigo-400 flex items-center justify-center">
-              <Users className="w-4 h-4" />
+            <span className="text-[11px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider">Volume</span>
+            <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-indigo-600/10 border border-indigo-500/20 text-indigo-400 flex items-center justify-center">
+              <Users className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             </div>
           </div>
-          <div className="mt-2 flex items-baseline gap-2">
-            <span className="text-2xl sm:text-3xl font-black text-white">{summary.totalTokens}</span>
-            <span className="text-xs text-slate-500">tokens</span>
+          <div className="mt-1.5 sm:mt-2 flex items-baseline gap-1.5">
+            <span className="text-xl sm:text-3xl font-black text-white">{summary.totalTokens}</span>
+            <span className="text-[10px] sm:text-xs text-slate-500">tokens</span>
           </div>
-          <div className="mt-2 text-[11px] text-slate-400 flex items-center gap-2">
+          <div className="mt-1 sm:mt-2 text-[10px] sm:text-[11px] text-slate-400 flex items-center gap-1.5">
             <span className="text-emerald-400 font-semibold">{summary.completedCount} Served</span>
             <span>•</span>
-            <span className="text-indigo-400 font-semibold">{summary.waitingCount} Waiting</span>
+            <span className="text-indigo-400 font-semibold">{summary.waitingCount} Wait</span>
           </div>
         </div>
 
         {/* Avg Wait Time */}
-        <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 sm:p-5 relative overflow-hidden">
+        <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-3.5 sm:p-5 relative overflow-hidden">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Avg Wait Time</span>
-            <div className="w-8 h-8 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-400 flex items-center justify-center">
-              <Clock className="w-4 h-4" />
+            <span className="text-[11px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider">Avg Wait</span>
+            <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-400 flex items-center justify-center">
+              <Clock className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             </div>
           </div>
-          <div className="mt-2 flex items-baseline gap-1.5">
-            <span className="text-2xl sm:text-3xl font-black text-amber-300">
+          <div className="mt-1.5 sm:mt-2 flex items-baseline gap-1">
+            <span className="text-xl sm:text-3xl font-black text-amber-300">
               {summary.avgWaitMinutes}
             </span>
-            <span className="text-xs text-amber-400/80 font-medium">mins</span>
+            <span className="text-[10px] sm:text-xs text-amber-400/80 font-medium">mins</span>
           </div>
-          <div className="mt-2 text-[11px] text-slate-400">
-            From arrival to counter assignment
+          <div className="mt-1 sm:mt-2 text-[10px] sm:text-[11px] text-slate-400 truncate">
+            Arrival to counter
           </div>
         </div>
 
         {/* Avg Service Duration */}
-        <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 sm:p-5 relative overflow-hidden">
+        <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-3.5 sm:p-5 relative overflow-hidden">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Avg Service Time</span>
-            <div className="w-8 h-8 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center">
-              <Hourglass className="w-4 h-4" />
+            <span className="text-[11px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider">Service</span>
+            <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center">
+              <Hourglass className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             </div>
           </div>
-          <div className="mt-2 flex items-baseline gap-1.5">
-            <span className="text-2xl sm:text-3xl font-black text-emerald-300">
+          <div className="mt-1.5 sm:mt-2 flex items-baseline gap-1">
+            <span className="text-xl sm:text-3xl font-black text-emerald-300">
               {summary.avgServiceMinutes}
             </span>
-            <span className="text-xs text-emerald-400/80 font-medium">mins</span>
+            <span className="text-[10px] sm:text-xs text-emerald-400/80 font-medium">mins</span>
           </div>
-          <div className="mt-2 text-[11px] text-slate-400">
-            Average transaction duration
+          <div className="mt-1 sm:mt-2 text-[10px] sm:text-[11px] text-slate-400 truncate">
+            Desk transaction time
           </div>
         </div>
 
         {/* Cancellation Rate */}
-        <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 sm:p-5 relative overflow-hidden">
+        <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-3.5 sm:p-5 relative overflow-hidden">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Dropoff Rate</span>
-            <div className="w-8 h-8 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-400 flex items-center justify-center">
-              <XCircle className="w-4 h-4" />
+            <span className="text-[11px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider">Dropoff</span>
+            <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-400 flex items-center justify-center">
+              <XCircle className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             </div>
           </div>
-          <div className="mt-2 flex items-baseline gap-1.5">
-            <span className="text-2xl sm:text-3xl font-black text-rose-300">
+          <div className="mt-1.5 sm:mt-2 flex items-baseline gap-1">
+            <span className="text-xl sm:text-3xl font-black text-rose-300">
               {summary.cancellationRate}%
             </span>
-            <span className="text-xs text-slate-500">cancelled</span>
+            <span className="text-[10px] sm:text-xs text-slate-500">rate</span>
           </div>
-          <div className="mt-2 text-[11px] text-slate-400">
-            {summary.cancelledCount} tokens dropped / no-show
+          <div className="mt-1 sm:mt-2 text-[10px] sm:text-[11px] text-slate-400 truncate">
+            {summary.cancelledCount} dropped / no-show
           </div>
         </div>
       </div>
 
       {/* Main Charts Row */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
         {/* Chart 1: Hourly Queue Length & Throughput Trend */}
-        <div className="lg:col-span-2 bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl">
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <h3 className="font-bold text-white text-base">Queue Length Trends & Hourly Arrivals</h3>
-              <p className="text-xs text-slate-400">Token arrival volume and serviced counts across time</p>
-            </div>
+        <div className="lg:col-span-2 bg-slate-900 border border-slate-800 rounded-2xl p-4 sm:p-5 shadow-xl">
+          <div className="mb-3 sm:mb-4">
+            <h3 className="font-bold text-white text-sm sm:text-base">Queue Length Trends & Hourly Arrivals</h3>
+            <p className="text-[11px] sm:text-xs text-slate-400">Tokens created vs serviced per hour</p>
           </div>
 
-          <div className="h-72 w-full">
+          <div className="h-56 sm:h-72 w-full">
             {data?.hourlyTrends && data.hourlyTrends.length > 0 ? (
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={data.hourlyTrends}>
@@ -221,15 +219,15 @@ export default function AnalyticsDashboard({ queues }) {
                     </linearGradient>
                   </defs>
                   <CartesianGrid strokeDasharray="3 3" stroke="#1E293B" />
-                  <XAxis dataKey="hour" stroke="#64748B" fontSize={11} />
-                  <YAxis stroke="#64748B" fontSize={11} allowDecimals={false} />
+                  <XAxis dataKey="hour" stroke="#64748B" fontSize={10} />
+                  <YAxis stroke="#64748B" fontSize={10} allowDecimals={false} />
                   <Tooltip
-                    contentStyle={{ backgroundColor: '#0F172A', borderColor: '#334155', borderRadius: '12px', fontSize: '12px' }}
+                    contentStyle={{ backgroundColor: '#0F172A', borderColor: '#334155', borderRadius: '12px', fontSize: '11px' }}
                     labelStyle={{ color: '#F8FAFC', fontWeight: 'bold' }}
                   />
-                  <Legend wrapperStyle={{ fontSize: '12px', paddingTop: '10px' }} />
-                  <Area type="monotone" dataKey="arrivals" name="Tokens Created" stroke="#6366F1" strokeWidth={2} fillOpacity={1} fill="url(#colorArrivals)" />
-                  <Area type="monotone" dataKey="served" name="Tokens Serviced" stroke="#10B981" strokeWidth={2} fillOpacity={1} fill="url(#colorServed)" />
+                  <Legend wrapperStyle={{ fontSize: '11px', paddingTop: '6px' }} />
+                  <Area type="monotone" dataKey="arrivals" name="Created" stroke="#6366F1" strokeWidth={2} fillOpacity={1} fill="url(#colorArrivals)" />
+                  <Area type="monotone" dataKey="served" name="Serviced" stroke="#10B981" strokeWidth={2} fillOpacity={1} fill="url(#colorServed)" />
                 </AreaChart>
               </ResponsiveContainer>
             ) : (
@@ -241,13 +239,13 @@ export default function AnalyticsDashboard({ queues }) {
         </div>
 
         {/* Chart 2: Status Breakdown Donut Chart */}
-        <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl">
-          <div className="mb-4">
-            <h3 className="font-bold text-white text-base">Token Status Distribution</h3>
-            <p className="text-xs text-slate-400">Proportion of tokens by current lifecycle</p>
+        <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 sm:p-5 shadow-xl">
+          <div className="mb-3 sm:mb-4">
+            <h3 className="font-bold text-white text-sm sm:text-base">Token Status Distribution</h3>
+            <p className="text-[11px] sm:text-xs text-slate-400">Proportion of tokens by current lifecycle</p>
           </div>
 
-          <div className="h-72 w-full flex flex-col items-center justify-center">
+          <div className="h-56 sm:h-72 w-full flex flex-col items-center justify-center">
             {summary.totalTokens > 0 ? (
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
@@ -255,8 +253,8 @@ export default function AnalyticsDashboard({ queues }) {
                     data={data?.statusBreakdown || []}
                     cx="50%"
                     cy="45%"
-                    innerRadius={55}
-                    outerRadius={85}
+                    innerRadius={50}
+                    outerRadius={75}
                     paddingAngle={4}
                     dataKey="value"
                   >
@@ -265,9 +263,9 @@ export default function AnalyticsDashboard({ queues }) {
                     ))}
                   </Pie>
                   <Tooltip
-                    contentStyle={{ backgroundColor: '#0F172A', borderColor: '#334155', borderRadius: '12px', fontSize: '12px' }}
+                    contentStyle={{ backgroundColor: '#0F172A', borderColor: '#334155', borderRadius: '12px', fontSize: '11px' }}
                   />
-                  <Legend wrapperStyle={{ fontSize: '11px', bottom: 0 }} />
+                  <Legend wrapperStyle={{ fontSize: '10px', bottom: 0 }} />
                 </PieChart>
               </ResponsiveContainer>
             ) : (
@@ -278,27 +276,27 @@ export default function AnalyticsDashboard({ queues }) {
       </div>
 
       {/* Second Row: Wait Time by Queue & Queue Details Table */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
         {/* Wait Times by Queue */}
-        <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl">
-          <div className="mb-4">
-            <h3 className="font-bold text-white text-base">Average Wait Times by Queue (Minutes)</h3>
-            <p className="text-xs text-slate-400">Comparing customer wait times across departments</p>
+        <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 sm:p-5 shadow-xl">
+          <div className="mb-3 sm:mb-4">
+            <h3 className="font-bold text-white text-sm sm:text-base">Average Wait Times by Queue</h3>
+            <p className="text-[11px] sm:text-xs text-slate-400">Comparing customer wait times across departments</p>
           </div>
 
-          <div className="h-64 w-full">
+          <div className="h-52 sm:h-64 w-full">
             {data?.queueComparison && data.queueComparison.length > 0 ? (
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={data.queueComparison}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#1E293B" />
-                  <XAxis dataKey="code_prefix" stroke="#64748B" fontSize={11} />
-                  <YAxis stroke="#64748B" fontSize={11} unit="m" />
+                  <XAxis dataKey="code_prefix" stroke="#64748B" fontSize={10} />
+                  <YAxis stroke="#64748B" fontSize={10} unit="m" />
                   <Tooltip
-                    contentStyle={{ backgroundColor: '#0F172A', borderColor: '#334155', borderRadius: '12px', fontSize: '12px' }}
+                    contentStyle={{ backgroundColor: '#0F172A', borderColor: '#334155', borderRadius: '12px', fontSize: '11px' }}
                     labelStyle={{ color: '#F8FAFC', fontWeight: 'bold' }}
                   />
-                  <Bar dataKey="avg_wait_min" name="Avg Wait (Minutes)" fill="#F59E0B" radius={[6, 6, 0, 0]} />
-                  <Bar dataKey="avg_service_min" name="Avg Service (Minutes)" fill="#10B981" radius={[6, 6, 0, 0]} />
+                  <Bar dataKey="avg_wait_min" name="Avg Wait (min)" fill="#F59E0B" radius={[4, 4, 0, 0]} />
+                  <Bar dataKey="avg_service_min" name="Avg Service (min)" fill="#10B981" radius={[4, 4, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             ) : (
@@ -310,39 +308,39 @@ export default function AnalyticsDashboard({ queues }) {
         </div>
 
         {/* Priority Speed Stats & Department Summary */}
-        <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl flex flex-col justify-between">
+        <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 sm:p-5 shadow-xl flex flex-col justify-between">
           <div>
-            <h3 className="font-bold text-white text-base mb-1">Queue Department Breakdown</h3>
-            <p className="text-xs text-slate-400 mb-4">Detailed breakdown of throughput and backlog</p>
+            <h3 className="font-bold text-white text-sm sm:text-base mb-1">Queue Department Breakdown</h3>
+            <p className="text-[11px] sm:text-xs text-slate-400 mb-3 sm:mb-4">Throughput and backlog status</p>
 
-            <div className="overflow-x-auto">
-              <table className="w-full text-left text-xs">
+            <div className="overflow-x-auto -mx-2 px-2 sm:mx-0 sm:px-0">
+              <table className="w-full text-left text-xs min-w-[280px]">
                 <thead>
                   <tr className="border-b border-slate-800 text-slate-400">
-                    <th className="pb-2 font-semibold">Queue Name</th>
+                    <th className="pb-2 font-semibold">Queue</th>
                     <th className="pb-2 font-semibold">Waiting</th>
                     <th className="pb-2 font-semibold">Served</th>
-                    <th className="pb-2 font-semibold">Avg Wait</th>
+                    <th className="pb-2 font-semibold">Wait</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-800/60 text-slate-300">
                   {data?.queueComparison && data.queueComparison.map((q) => (
                     <tr key={q.id} className="hover:bg-slate-800/30">
                       <td className="py-2.5 font-medium flex items-center gap-1.5 text-white">
-                        <span className="font-mono text-[10px] px-1.5 py-0.5 rounded bg-slate-800 text-indigo-300">
+                        <span className="font-mono text-[9px] px-1.5 py-0.2 rounded bg-slate-800 text-indigo-300">
                           {q.code_prefix}
                         </span>
-                        <span className="truncate max-w-[140px]">{q.name}</span>
+                        <span className="truncate max-w-[100px] sm:max-w-[140px]">{q.name}</span>
                       </td>
                       <td className="py-2.5">
-                        <span className="px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 font-semibold text-[11px]">
+                        <span className="px-1.5 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 font-semibold text-[10px]">
                           {q.waiting_now}
                         </span>
                       </td>
                       <td className="py-2.5 text-emerald-400 font-medium">
                         {q.completed_tokens}
                       </td>
-                      <td className="py-2.5 text-amber-400 font-mono">
+                      <td className="py-2.5 text-amber-400 font-mono text-[11px]">
                         {q.avg_wait_min ? `${q.avg_wait_min}m` : '0m'}
                       </td>
                     </tr>
@@ -352,8 +350,8 @@ export default function AnalyticsDashboard({ queues }) {
             </div>
           </div>
 
-          <div className="mt-4 pt-3 border-t border-slate-800 flex items-center justify-between text-xs text-slate-400">
-            <span>Overall Queue System Efficiency:</span>
+          <div className="mt-3 pt-2.5 border-t border-slate-800 flex items-center justify-between text-[11px] sm:text-xs text-slate-400">
+            <span>System Efficiency:</span>
             <span className="font-semibold text-emerald-400">
               {summary.completedCount > 0 ? `${Math.round((summary.completedCount / summary.totalTokens) * 100)}% Fulfilled` : 'Ready'}
             </span>

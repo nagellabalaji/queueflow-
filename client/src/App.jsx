@@ -242,18 +242,18 @@ export default function App() {
       <Navbar activeTab={activeTab} setActiveTab={setActiveTab} />
 
       {/* Main Container */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <main className="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 lg:px-8 py-3.5 sm:py-6">
         {activeTab === 'analytics' ? (
           <AnalyticsDashboard queues={queues} />
         ) : activeTab === 'kiosk' ? (
           currentQueue ? (
             <PublicDisplayModal queue={currentQueue} onClose={() => setActiveTab('queues')} />
           ) : (
-            <div className="p-12 text-center text-slate-400">Please create a queue first.</div>
+            <div className="p-8 sm:p-12 text-center text-slate-400">Please create a queue first.</div>
           )
         ) : (
           /* Operations & Queues View */
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-3.5 sm:gap-6">
             {/* Left Column: Queues Navigation (3 cols) */}
             <div className="lg:col-span-4 xl:col-span-3">
               <QueueSidebar
@@ -265,38 +265,38 @@ export default function App() {
             </div>
 
             {/* Right Column: Queue Operations (9 cols) */}
-            <div className="lg:col-span-8 xl:col-span-9 space-y-6">
+            <div className="lg:col-span-8 xl:col-span-9 space-y-3.5 sm:space-y-6">
               {currentQueue ? (
                 <>
                   {/* Queue Title Bar & Quick Actions */}
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 bg-slate-900 border border-slate-800 rounded-2xl shadow-xl">
-                    <div className="flex items-start sm:items-center gap-3.5">
-                      <div className="w-12 h-12 rounded-2xl bg-indigo-600/20 border border-indigo-500/30 text-indigo-300 font-mono font-black text-lg flex items-center justify-center shrink-0">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 p-3.5 sm:p-5 bg-slate-900 border border-slate-800 rounded-2xl shadow-xl">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-indigo-600/20 border border-indigo-500/30 text-indigo-300 font-mono font-black text-base sm:text-lg flex items-center justify-center shrink-0">
                         {currentQueue.code_prefix}
                       </div>
-                      <div>
+                      <div className="min-w-0">
                         <div className="flex items-center gap-2">
-                          <h1 className="text-xl font-bold text-white tracking-tight">{currentQueue.name}</h1>
+                          <h1 className="text-base sm:text-xl font-bold text-white tracking-tight truncate">{currentQueue.name}</h1>
                         </div>
-                        <p className="text-xs text-slate-400 mt-0.5 flex items-center gap-2">
-                          <span className="flex items-center gap-1">
+                        <p className="text-[11px] sm:text-xs text-slate-400 mt-0.5 flex items-center gap-1.5 sm:gap-2 truncate">
+                          <span className="flex items-center gap-1 text-slate-300 shrink-0">
                             <Building2 className="w-3.5 h-3.5 text-indigo-400" />
                             {currentQueue.counter_name || 'Counter 1'}
                           </span>
                           {currentQueue.description && (
                             <>
                               <span>•</span>
-                              <span className="truncate max-w-xs">{currentQueue.description}</span>
+                              <span className="truncate max-w-[160px] sm:max-w-xs">{currentQueue.description}</span>
                             </>
                           )}
                         </p>
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 self-end sm:self-center">
                       <button
                         onClick={() => setActiveTab('kiosk')}
-                        className="py-2 px-3 bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white rounded-xl border border-slate-700 text-xs font-semibold flex items-center gap-1.5 transition-colors"
+                        className="py-1.5 sm:py-2 px-2.5 sm:px-3 bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white rounded-xl border border-slate-700 text-xs font-semibold flex items-center gap-1.5 transition-colors"
                         title="Open Fullscreen TV Monitor Display"
                       >
                         <Tv className="w-3.5 h-3.5 text-indigo-400" />
@@ -305,7 +305,7 @@ export default function App() {
 
                       <button
                         onClick={() => setIsAddTokenOpen(true)}
-                        className="py-2 px-3.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-semibold shadow-md shadow-indigo-600/30 flex items-center gap-1.5 transition-all"
+                        className="py-1.5 sm:py-2 px-3 sm:px-3.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-semibold shadow-md shadow-indigo-600/30 flex items-center gap-1.5 transition-all"
                       >
                         <Plus className="w-3.5 h-3.5" />
                         <span>Add Person</span>
