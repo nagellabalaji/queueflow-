@@ -57,12 +57,12 @@ export default function WaitingQueueList({
   const topToken = waitingTokens.length > 0 ? waitingTokens[0] : null;
 
   return (
-    <div className="bg-white border border-[#E5E3DC] rounded-2xl p-5 sm:p-6 shadow-sm space-y-4">
+    <div className="bg-white border border-[#E5E3DC] rounded-2xl p-4 sm:p-6 shadow-sm space-y-4">
       {/* Action Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-[#E5E3DC]">
         <div>
           <div className="flex items-center gap-2">
-            <h3 className="text-lg font-bold text-[#243447] tracking-tight">Waiting Queue</h3>
+            <h3 className="text-base sm:text-lg font-bold text-[#243447] tracking-tight">Waiting Queue</h3>
             <span className="px-2.5 py-0.5 rounded-full bg-[#4F807A]/15 border border-[#4F807A]/25 text-[#4F807A] font-bold text-xs">
               {waitingTokens.length} in line
             </span>
@@ -78,13 +78,13 @@ export default function WaitingQueueList({
           <button
             onClick={() => onServeNext(queue.id)}
             disabled={waitingTokens.length === 0 || loadingAction}
-            className="flex-1 sm:flex-none py-2.5 px-4 bg-[#243447] hover:bg-[#1b2735] text-white font-bold text-xs sm:text-sm rounded-xl shadow-sm transition-all flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed"
+            className="flex-1 sm:flex-none min-h-[40px] py-2 px-3.5 sm:px-4 bg-[#243447] hover:bg-[#1b2735] text-white font-bold text-xs sm:text-sm rounded-xl shadow-xs transition-all flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
             title={topToken ? `Call top token: ${topToken.token_code} (${topToken.customer_name})` : 'No tokens in queue'}
           >
             <PlayCircle className="w-4 h-4 text-[#4F807A]" />
             <span className="whitespace-nowrap">Assign Top Token</span>
             {topToken && (
-              <span className="hidden xs:inline px-1.5 py-0.5 rounded bg-white/20 text-white text-[11px] font-mono">
+              <span className="hidden sm:inline px-1.5 py-0.5 rounded bg-white/20 text-white text-[11px] font-mono">
                 {topToken.token_code}
               </span>
             )}
@@ -93,7 +93,7 @@ export default function WaitingQueueList({
           {/* Add person */}
           <button
             onClick={onOpenAddModal}
-            className="py-2.5 px-3.5 bg-[#F7F6F2] hover:bg-[#E5E3DC] text-[#243447] font-bold text-xs sm:text-sm rounded-xl border border-[#E5E3DC] transition-all flex items-center justify-center gap-1.5 shrink-0"
+            className="min-h-[40px] py-2 px-3 sm:px-3.5 bg-[#F7F6F2] hover:bg-[#E5E3DC] text-[#243447] font-bold text-xs sm:text-sm rounded-xl border border-[#E5E3DC] transition-all flex items-center justify-center gap-1.5 shrink-0 cursor-pointer"
           >
             <UserPlus className="w-4 h-4 text-[#4F807A]" />
             <span>Add Person</span>
@@ -153,27 +153,27 @@ export default function WaitingQueueList({
                 }`}
               >
                 {/* Left: Position Badge & Customer Info */}
-                <div className="flex items-center gap-3 min-w-0">
+                <div className="flex items-center gap-2 sm:gap-3 min-w-0">
                   {/* Position Badge */}
                   <div
-                    className={`flex flex-col items-center justify-center w-9 h-9 rounded-xl font-black text-xs shrink-0 ${
+                    className={`flex flex-col items-center justify-center w-8 h-8 sm:w-9 sm:h-9 rounded-xl font-black text-xs shrink-0 ${
                       isTop
                         ? 'bg-[#243447] text-white shadow-xs'
                         : 'bg-white text-[#30343B] border border-[#E5E3DC]'
                     }`}
                   >
-                    <span className="text-[11px]">#{token.position}</span>
+                    <span className="text-[10px] sm:text-[11px]">#{token.position}</span>
                     {isTop && <span className="text-[7px] font-mono leading-none text-[#4F807A]">NEXT</span>}
                   </div>
 
                   {/* Token Code */}
-                  <div className="shrink-0 font-mono text-xs sm:text-sm font-black text-[#243447] px-2.5 py-1 bg-white border border-[#E5E3DC] rounded-lg whitespace-nowrap">
+                  <div className="shrink-0 font-mono text-xs sm:text-sm font-black text-[#243447] px-2 sm:px-2.5 py-0.5 sm:py-1 bg-white border border-[#E5E3DC] rounded-lg whitespace-nowrap">
                     {token.token_code}
                   </div>
 
                   {/* Customer details */}
                   <div className="min-w-0 truncate">
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-1.5 sm:gap-2">
                       <span className="font-bold text-xs sm:text-sm text-[#243447] truncate">
                         {token.customer_name}
                       </span>
@@ -183,8 +183,8 @@ export default function WaitingQueueList({
                         </span>
                       )}
                     </div>
-                    <div className="flex items-center gap-3 text-[11px] text-[#30343B]/60 mt-0.5">
-                      {token.customer_phone && <span className="hidden xs:inline">{token.customer_phone}</span>}
+                    <div className="flex items-center gap-2 sm:gap-3 text-[10px] sm:text-[11px] text-[#30343B]/60 mt-0.5">
+                      {token.customer_phone && <span className="hidden sm:inline">{token.customer_phone}</span>}
                       <span className="flex items-center gap-1">
                         <Clock className="w-3 h-3 text-[#30343B]/40 shrink-0" />
                         <span>Wait: {formatWaitTime(token.created_at)}</span>

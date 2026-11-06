@@ -296,14 +296,14 @@ export default function App() {
               {currentQueue ? (
                 <>
                   {/* Queue Title Bar & Quick Actions */}
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 bg-white border border-[#E5E3DC] rounded-2xl shadow-sm">
-                    <div className="flex items-center gap-3.5">
-                      <div className="w-12 h-12 rounded-2xl bg-[#243447] text-white font-mono font-black text-lg flex items-center justify-center shrink-0 shadow-sm">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3.5 sm:gap-4 p-4 sm:p-5 bg-white border border-[#E5E3DC] rounded-2xl shadow-sm">
+                    <div className="flex items-center gap-3 sm:gap-3.5 min-w-0">
+                      <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-[#243447] text-white font-mono font-black text-base sm:text-lg flex items-center justify-center shrink-0 shadow-sm">
                         {currentQueue.code_prefix}
                       </div>
                       <div className="min-w-0">
                         <div className="flex items-center gap-2">
-                          <h1 className="text-lg sm:text-xl font-black text-[#243447] tracking-tight truncate">{currentQueue.name}</h1>
+                          <h1 className="text-base sm:text-xl font-black text-[#243447] tracking-tight truncate">{currentQueue.name}</h1>
                         </div>
                         <p className="text-xs text-[#30343B]/60 mt-0.5 flex items-center gap-2 truncate">
                           <span className="flex items-center gap-1 font-semibold text-[#4F807A] shrink-0">
@@ -313,17 +313,17 @@ export default function App() {
                           {currentQueue.description && (
                             <>
                               <span>•</span>
-                              <span className="truncate max-w-[200px] sm:max-w-xs">{currentQueue.description}</span>
+                              <span className="truncate max-w-[160px] sm:max-w-xs">{currentQueue.description}</span>
                             </>
                           )}
                         </p>
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-2 self-end sm:self-center">
+                    <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
                       <button
                         onClick={() => setActiveTab('kiosk')}
-                        className="py-2 px-3 bg-[#F7F6F2] hover:bg-[#E5E3DC] text-[#243447] rounded-xl border border-[#E5E3DC] text-xs font-bold flex items-center gap-1.5 transition-colors"
+                        className="flex-1 sm:flex-none min-h-[38px] py-2 px-3 bg-[#F7F6F2] hover:bg-[#E5E3DC] text-[#243447] rounded-xl border border-[#E5E3DC] text-xs font-bold flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
                         title="Open TV Counter Display"
                       >
                         <Tv className="w-3.5 h-3.5 text-[#4F807A]" />
@@ -332,7 +332,7 @@ export default function App() {
 
                       <button
                         onClick={() => setIsAddTokenOpen(true)}
-                        className="py-2 px-3.5 bg-[#243447] hover:bg-[#1b2735] text-white rounded-xl text-xs font-bold shadow-xs flex items-center gap-1.5 transition-all"
+                        className="flex-1 sm:flex-none min-h-[38px] py-2 px-3.5 bg-[#243447] hover:bg-[#1b2735] text-white rounded-xl text-xs font-bold shadow-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer"
                       >
                         <Plus className="w-3.5 h-3.5" />
                         <span>Add Person</span>

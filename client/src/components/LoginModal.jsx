@@ -259,25 +259,30 @@ export default function LoginModal() {
       </div>
 
       {/* RIGHT PANEL: Modern Clean SaaS Authentication Form */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-10 xl:p-16">
-        <div className="w-full max-w-md space-y-6 animate-fade-in">
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-4 sm:p-8 xl:p-16">
+        <div className="w-full max-w-md space-y-5 sm:space-y-6 animate-fade-in">
           {/* Mobile Branding Header (< lg) */}
-          <div className="lg:hidden flex items-center gap-3 mb-4">
-            <div className="w-9 h-9 rounded-xl bg-[#243447] text-white flex items-center justify-center shadow-md">
+          <div className="lg:hidden flex items-center gap-3 mb-2 sm:mb-4">
+            <div className="w-9 h-9 rounded-xl bg-[#243447] text-white flex items-center justify-center shadow-md shrink-0">
               <Layers className="w-5 h-5 text-white" />
             </div>
             <div>
-              <span className="font-bold text-lg tracking-tight text-[#243447]">QueueFlow</span>
+              <div className="flex items-center gap-1.5">
+                <span className="font-black text-lg tracking-tight text-[#243447]">QueueFlow</span>
+                <span className="text-[9px] uppercase font-bold tracking-wider px-1.5 py-0.5 rounded bg-[#4F807A]/15 text-[#4F807A]">
+                  PRO
+                </span>
+              </div>
               <p className="text-[11px] text-[#5B626C]">Queue Management System</p>
             </div>
           </div>
 
           {/* Form Header */}
-          <div className="space-y-1.5">
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-[#243447] tracking-tight font-sans">
+          <div className="space-y-1">
+            <h2 className="text-xl sm:text-3xl font-extrabold text-[#243447] tracking-tight font-sans">
               {isRegister ? 'Create Manager Account' : 'Manager Sign In'}
             </h2>
-            <p className="text-sm text-[#5B626C]">
+            <p className="text-xs sm:text-sm text-[#5B626C]">
               {isRegister 
                 ? 'Register an administrative manager account to operate queues.' 
                 : 'Welcome back. Enter your credentials to access the management console.'}
@@ -285,7 +290,7 @@ export default function LoginModal() {
           </div>
 
           {/* 1-Click Demo Login Banner */}
-          <div className="p-3.5 rounded-2xl bg-[#EDF5F4] border border-[#4F807A]/30 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-subtle">
+          <div className="p-3 sm:p-3.5 rounded-2xl bg-[#EDF5F4] border border-[#4F807A]/30 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 sm:gap-3 shadow-subtle">
             <div className="flex items-center gap-2.5">
               <div className="w-8 h-8 rounded-xl bg-[#4F807A] text-white flex items-center justify-center shrink-0">
                 <Sparkles className="w-4 h-4" />
@@ -300,7 +305,7 @@ export default function LoginModal() {
               type="button"
               onClick={handleDemoLogin}
               disabled={loading}
-              className="py-1.5 px-3 bg-[#4F807A] hover:bg-[#416B66] text-white text-xs font-semibold rounded-xl transition-all shadow-sm flex items-center justify-center gap-1.5 disabled:opacity-50 shrink-0"
+              className="w-full sm:w-auto min-h-[38px] py-1.5 px-3.5 bg-[#4F807A] hover:bg-[#416B66] text-white text-xs font-semibold rounded-xl transition-all shadow-sm flex items-center justify-center gap-1.5 disabled:opacity-50 shrink-0 cursor-pointer"
             >
               <span>Auto-Fill & Sign In</span>
               <ArrowRight className="w-3.5 h-3.5" />
@@ -458,7 +463,7 @@ export default function LoginModal() {
               type="button"
               onClick={handleGoogleLogin}
               disabled={loading}
-              className="flex-1 py-2.5 px-4 bg-white hover:bg-[#FDFCFB] border border-[#DADCE0] hover:border-[#4F807A]/50 text-[#3C4043] font-bold text-xs sm:text-sm rounded-xl transition-all shadow-xs flex items-center justify-center gap-3 disabled:opacity-50 group cursor-pointer"
+              className="flex-1 min-h-[44px] py-2.5 px-4 bg-white hover:bg-[#FDFCFB] border border-[#DADCE0] hover:border-[#4F807A]/50 text-[#3C4043] font-bold text-xs sm:text-sm rounded-xl transition-all shadow-xs flex items-center justify-center gap-2.5 sm:gap-3 disabled:opacity-50 group cursor-pointer"
             >
               <svg className="w-4 h-4 shrink-0 transition-transform group-hover:scale-110" viewBox="0 0 24 24">
                 <path
@@ -487,7 +492,7 @@ export default function LoginModal() {
                 setShowGoogleConfigModal(true);
               }}
               title="Configure Google OAuth Client ID"
-              className="p-2.5 bg-white hover:bg-[#FDFCFB] border border-[#DADCE0] hover:border-[#4F807A]/50 text-[#8B929C] hover:text-[#243447] rounded-xl transition-all shadow-xs cursor-pointer"
+              className="min-h-[44px] min-w-[44px] flex items-center justify-center p-2.5 bg-white hover:bg-[#FDFCFB] border border-[#DADCE0] hover:border-[#4F807A]/50 text-[#8B929C] hover:text-[#243447] rounded-xl transition-all shadow-xs cursor-pointer shrink-0"
             >
               <Settings className="w-4 h-4" />
             </button>
@@ -524,8 +529,8 @@ export default function LoginModal() {
 
       {/* Google OAuth 2.0 Configuration Modal */}
       {showGoogleConfigModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in">
-          <div className="w-full max-w-lg bg-white border border-[#E3E0D8] rounded-2xl p-6 shadow-2xl relative space-y-4 max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/50 backdrop-blur-sm animate-fade-in">
+          <div className="w-full max-w-lg bg-white border border-[#E3E0D8] rounded-2xl p-4 sm:p-6 shadow-2xl relative space-y-4 max-h-[92vh] overflow-y-auto">
             <button
               onClick={() => setShowGoogleConfigModal(false)}
               className="absolute top-4 right-4 text-[#8B929C] hover:text-[#30343B] p-1 rounded-lg"
@@ -555,27 +560,27 @@ export default function LoginModal() {
                 Google requires a valid <strong>Web application</strong> OAuth 2.0 Client ID created in Google Cloud Console. To avoid <span className="font-mono text-red-600 bg-red-50 px-1 py-0.5 rounded font-semibold">Error 401: invalid_client</span>, set the exact origins and redirect URIs below:
               </p>
 
-              <div className="space-y-2.5 p-3.5 bg-[#F7F6F2] rounded-xl border border-[#E3E0D8]">
+              <div className="space-y-2.5 p-3 sm:p-3.5 bg-[#F7F6F2] rounded-xl border border-[#E3E0D8]">
                 <div className="font-semibold text-[#243447] text-[11px] uppercase tracking-wider">
                   1. Authorized JavaScript Origins:
                 </div>
-                <div className="flex items-center justify-between bg-white px-3 py-1.5 rounded-lg border border-[#E3E0D8] font-mono text-[11px]">
+                <div className="flex items-center justify-between bg-white px-2.5 sm:px-3 py-1.5 rounded-lg border border-[#E3E0D8] font-mono text-[10px] sm:text-[11px]">
                   <span className="truncate">https://nagellabalaji.github.io</span>
                   <button
                     type="button"
                     onClick={() => copyToClipboard('https://nagellabalaji.github.io', 'orig1')}
-                    className="ml-2 text-[#4F807A] hover:text-[#243447] flex items-center gap-1 font-sans text-xs font-medium"
+                    className="ml-2 text-[#4F807A] hover:text-[#243447] flex items-center gap-1 font-sans text-xs font-medium shrink-0"
                   >
                     {copiedField === 'orig1' ? <Check className="w-3.5 h-3.5 text-green-600" /> : <Copy className="w-3.5 h-3.5" />}
                     <span>{copiedField === 'orig1' ? 'Copied' : 'Copy'}</span>
                   </button>
                 </div>
-                <div className="flex items-center justify-between bg-white px-3 py-1.5 rounded-lg border border-[#E3E0D8] font-mono text-[11px]">
+                <div className="flex items-center justify-between bg-white px-2.5 sm:px-3 py-1.5 rounded-lg border border-[#E3E0D8] font-mono text-[10px] sm:text-[11px]">
                   <span className="truncate">http://localhost:5173</span>
                   <button
                     type="button"
                     onClick={() => copyToClipboard('http://localhost:5173', 'orig2')}
-                    className="ml-2 text-[#4F807A] hover:text-[#243447] flex items-center gap-1 font-sans text-xs font-medium"
+                    className="ml-2 text-[#4F807A] hover:text-[#243447] flex items-center gap-1 font-sans text-xs font-medium shrink-0"
                   >
                     {copiedField === 'orig2' ? <Check className="w-3.5 h-3.5 text-green-600" /> : <Copy className="w-3.5 h-3.5" />}
                     <span>{copiedField === 'orig2' ? 'Copied' : 'Copy'}</span>
@@ -585,23 +590,23 @@ export default function LoginModal() {
                 <div className="font-semibold text-[#243447] text-[11px] uppercase tracking-wider pt-1">
                   2. Authorized Redirect URIs:
                 </div>
-                <div className="flex items-center justify-between bg-white px-3 py-1.5 rounded-lg border border-[#E3E0D8] font-mono text-[11px]">
+                <div className="flex items-center justify-between bg-white px-2.5 sm:px-3 py-1.5 rounded-lg border border-[#E3E0D8] font-mono text-[10px] sm:text-[11px]">
                   <span className="truncate">https://nagellabalaji.github.io/queueflow-/</span>
                   <button
                     type="button"
                     onClick={() => copyToClipboard('https://nagellabalaji.github.io/queueflow-/', 'redir1')}
-                    className="ml-2 text-[#4F807A] hover:text-[#243447] flex items-center gap-1 font-sans text-xs font-medium"
+                    className="ml-2 text-[#4F807A] hover:text-[#243447] flex items-center gap-1 font-sans text-xs font-medium shrink-0"
                   >
                     {copiedField === 'redir1' ? <Check className="w-3.5 h-3.5 text-green-600" /> : <Copy className="w-3.5 h-3.5" />}
                     <span>{copiedField === 'redir1' ? 'Copied' : 'Copy'}</span>
                   </button>
                 </div>
-                <div className="flex items-center justify-between bg-white px-3 py-1.5 rounded-lg border border-[#E3E0D8] font-mono text-[11px]">
+                <div className="flex items-center justify-between bg-white px-2.5 sm:px-3 py-1.5 rounded-lg border border-[#E3E0D8] font-mono text-[10px] sm:text-[11px]">
                   <span className="truncate">http://localhost:5173/</span>
                   <button
                     type="button"
                     onClick={() => copyToClipboard('http://localhost:5173/', 'redir2')}
-                    className="ml-2 text-[#4F807A] hover:text-[#243447] flex items-center gap-1 font-sans text-xs font-medium"
+                    className="ml-2 text-[#4F807A] hover:text-[#243447] flex items-center gap-1 font-sans text-xs font-medium shrink-0"
                   >
                     {copiedField === 'redir2' ? <Check className="w-3.5 h-3.5 text-green-600" /> : <Copy className="w-3.5 h-3.5" />}
                     <span>{copiedField === 'redir2' ? 'Copied' : 'Copy'}</span>
@@ -618,36 +623,36 @@ export default function LoginModal() {
                   placeholder="xxxx-xxxxxxxx.apps.googleusercontent.com"
                   value={configClientIdInput}
                   onChange={(e) => setConfigClientIdInput(e.target.value)}
-                  className="w-full bg-white border border-[#E3E0D8] rounded-xl px-3.5 py-2 font-mono text-xs text-[#30343B] placeholder-[#8B929C] focus:outline-none focus:border-[#4F807A] focus:ring-1 focus:ring-[#4F807A]"
+                  className="w-full bg-white border border-[#E3E0D8] rounded-xl px-3 sm:px-3.5 py-2 font-mono text-xs text-[#30343B] placeholder-[#8B929C] focus:outline-none focus:border-[#4F807A] focus:ring-1 focus:ring-[#4F807A]"
                 />
                 <p className="text-[11px] text-[#8B929C] mt-1">
                   Saved securely in your browser and used for real Google authentication.
                 </p>
               </div>
 
-              <div className="flex items-center justify-between pt-2">
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-2">
                 <a
                   href="https://console.cloud.google.com/apis/credentials"
                   target="_blank"
                   rel="noreferrer"
-                  className="text-xs text-[#4F807A] hover:underline flex items-center gap-1 font-medium"
+                  className="text-xs text-[#4F807A] hover:underline flex items-center gap-1 font-medium order-2 sm:order-1"
                 >
                   <span>Open Google Cloud Credentials</span>
                   <ExternalLink className="w-3 h-3" />
                 </a>
 
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 w-full sm:w-auto justify-end order-1 sm:order-2">
                   <button
                     type="button"
                     onClick={() => setShowGoogleConfigModal(false)}
-                    className="px-3 py-1.5 border border-[#E3E0D8] rounded-xl text-xs font-semibold text-[#5B626C] hover:bg-slate-50 cursor-pointer"
+                    className="flex-1 sm:flex-none px-3.5 py-2 border border-[#E3E0D8] rounded-xl text-xs font-semibold text-[#5B626C] hover:bg-slate-50 cursor-pointer"
                   >
                     Close
                   </button>
                   <button
                     type="button"
                     onClick={handleSaveGoogleClientId}
-                    className="px-4 py-1.5 bg-[#4F807A] hover:bg-[#416B66] text-white text-xs font-semibold rounded-xl shadow-sm transition-all cursor-pointer"
+                    className="flex-1 sm:flex-none px-4 py-2 bg-[#4F807A] hover:bg-[#416B66] text-white text-xs font-semibold rounded-xl shadow-sm transition-all cursor-pointer"
                   >
                     Save & Authenticate
                   </button>

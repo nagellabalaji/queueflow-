@@ -82,53 +82,53 @@ export default function ActiveServingCard({ servingToken, queue, onComplete, onR
   }
 
   return (
-    <div className="bg-white border border-[#E5E3DC] rounded-2xl p-5 sm:p-6 shadow-sm relative overflow-hidden animate-slide-up">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-5">
+    <div className="bg-white border border-[#E5E3DC] rounded-2xl p-4 sm:p-6 shadow-sm relative overflow-hidden animate-slide-up">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 sm:gap-5">
         {/* Token Info */}
-        <div className="flex items-center gap-4">
-          <div className="flex flex-col items-center justify-center min-w-[115px] sm:min-w-[130px] px-3.5 py-2.5 rounded-xl bg-[#243447] border-2 border-[#FFB6C1]/40 text-white shadow-sm shrink-0">
-            <span className="text-[9px] uppercase font-bold text-[#4F807A] tracking-wider whitespace-nowrap">NOW SERVING</span>
-            <span className="font-mono text-xl sm:text-2xl font-black text-[#FFB6C1] tracking-normal whitespace-nowrap py-0.5">
+        <div className="flex items-center gap-3 sm:gap-4 min-w-0">
+          <div className="flex flex-col items-center justify-center min-w-[105px] sm:min-w-[130px] px-2.5 sm:px-3.5 py-2 sm:py-2.5 rounded-xl bg-[#243447] border-2 border-[#FFB6C1]/40 text-white shadow-xs shrink-0">
+            <span className="text-[8px] sm:text-[9px] uppercase font-bold text-[#4F807A] tracking-wider whitespace-nowrap">NOW SERVING</span>
+            <span className="font-mono text-lg sm:text-2xl font-black text-[#FFB6C1] tracking-normal whitespace-nowrap py-0.5">
               {servingToken.token_code}
             </span>
-            <span className="text-[9px] text-[#64866A] font-bold flex items-center gap-1.5 mt-0.5 whitespace-nowrap">
+            <span className="text-[8px] sm:text-[9px] text-[#64866A] font-bold flex items-center gap-1.5 mt-0.5 whitespace-nowrap">
               <span className="w-1.5 h-1.5 rounded-full bg-[#64866A] animate-pulse" />
               ACTIVE
             </span>
           </div>
 
           <div className="min-w-0">
-            <div className="flex flex-wrap items-center gap-2 mb-1">
-              <h3 className="text-lg sm:text-xl font-black text-[#243447] truncate">
+            <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 mb-1">
+              <h3 className="text-base sm:text-xl font-black text-[#243447] truncate">
                 {servingToken.customer_name}
               </h3>
               {servingToken.priority && servingToken.priority !== 'NORMAL' && (
-                <span className="text-[9px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider bg-[#C98262]/15 text-[#C98262] border border-[#C98262]/30">
+                <span className="text-[8px] sm:text-[9px] font-bold px-1.5 sm:px-2 py-0.5 rounded-full uppercase tracking-wider bg-[#C98262]/15 text-[#C98262] border border-[#C98262]/30">
                   ★ {servingToken.priority}
                 </span>
               )}
               {servingToken.recall_count > 0 && (
-                <span className="text-[9px] font-bold px-2 py-0.5 rounded-full bg-[#4F807A]/15 text-[#4F807A] border border-[#4F807A]/30 flex items-center gap-1">
+                <span className="text-[8px] sm:text-[9px] font-bold px-1.5 sm:px-2 py-0.5 rounded-full bg-[#4F807A]/15 text-[#4F807A] border border-[#4F807A]/30 flex items-center gap-1">
                   <RotateCcw className="w-2.5 h-2.5" />
                   Recalled {servingToken.recall_count}x
                 </span>
               )}
             </div>
 
-            <div className="flex flex-wrap items-center gap-2.5 text-xs text-[#30343B]/70">
-              <span className="flex items-center gap-1 text-[#243447] font-semibold bg-[#F7F6F2] px-2.5 py-1 rounded-md border border-[#E5E3DC]">
+            <div className="flex flex-wrap items-center gap-1.5 sm:gap-2.5 text-xs text-[#30343B]/70">
+              <span className="flex items-center gap-1 text-[#243447] font-semibold bg-[#F7F6F2] px-2 sm:px-2.5 py-1 rounded-md border border-[#E5E3DC] text-[11px] sm:text-xs">
                 <Building2 className="w-3.5 h-3.5 text-[#4F807A]" />
                 {servingToken.counter_assigned || queue?.counter_name || 'Counter 1'}
               </span>
 
               {servingToken.customer_phone && (
-                <span className="hidden xs:flex items-center gap-1 text-[#30343B]/70">
+                <span className="hidden sm:flex items-center gap-1 text-[#30343B]/70 text-[11px] sm:text-xs">
                   <Phone className="w-3 h-3 text-[#30343B]/40" />
                   {servingToken.customer_phone}
                 </span>
               )}
 
-              <span className="flex items-center gap-1 text-[#64866A] font-mono font-bold bg-[#64866A]/10 px-2.5 py-1 rounded-md border border-[#64866A]/20">
+              <span className="flex items-center gap-1 text-[#64866A] font-mono font-bold bg-[#64866A]/10 px-2 sm:px-2.5 py-1 rounded-md border border-[#64866A]/20 text-[11px] sm:text-xs">
                 <Clock className="w-3.5 h-3.5 text-[#64866A]" />
                 {formatDuration(elapsed)}
               </span>
@@ -137,12 +137,12 @@ export default function ActiveServingCard({ servingToken, queue, onComplete, onR
         </div>
 
         {/* Action Buttons */}
-        <div className="flex items-center gap-2.5 w-full md:w-auto pt-3 md:pt-0 border-t md:border-t-0 border-[#E5E3DC]">
+        <div className="flex items-center gap-2 sm:gap-2.5 w-full md:w-auto pt-3 md:pt-0 border-t md:border-t-0 border-[#E5E3DC]">
           <button
             onClick={handleRecallClick}
             disabled={recalling}
             title="Recall customer / re-announce aloud"
-            className="py-2.5 px-3.5 rounded-xl bg-[#F7F6F2] hover:bg-[#E5E3DC] text-[#243447] border border-[#E5E3DC] font-bold text-xs transition-colors flex items-center justify-center gap-1.5 shrink-0"
+            className="min-h-[42px] py-2 px-3 sm:px-3.5 rounded-xl bg-[#F7F6F2] hover:bg-[#E5E3DC] text-[#243447] border border-[#E5E3DC] font-bold text-xs transition-colors flex items-center justify-center gap-1.5 shrink-0 cursor-pointer"
           >
             <Volume2 className="w-4 h-4 text-[#4F807A]" />
             <span>Recall</span>
@@ -151,7 +151,7 @@ export default function ActiveServingCard({ servingToken, queue, onComplete, onR
           <button
             onClick={handleComplete}
             disabled={completing}
-            className="flex-1 md:flex-none py-2.5 px-5 bg-[#64866A] hover:bg-[#527057] text-white font-bold text-xs sm:text-sm rounded-xl shadow-sm transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+            className="flex-1 md:flex-none min-h-[42px] py-2 px-4 sm:px-5 bg-[#64866A] hover:bg-[#527057] text-white font-bold text-xs sm:text-sm rounded-xl shadow-xs transition-all flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
           >
             <CheckCircle2 className="w-4 h-4" />
             <span>{completing ? 'Completing...' : 'Complete Service'}</span>
