@@ -118,14 +118,30 @@ router.post('/demo', (req, res) => {
   }
 });
 
-// Google OAuth Sign-In endpoint
+// Google OAuth Sign-In endpoint with official token verification
 router.post('/google', async (req, res) => {
   const { access_token, id_token, email, name, google_id } = req.body || {};
 
   let verifiedEmail = email;
-  let verifiedName = name || 'Google Administrator';
+  let verifiedName = name || 'Google Manager';
 
-  // If Google access_token is sent, verify with Google directly
+  // 1. Verify ID token via Google's tokeninfo API
+  if (id_token) {
+    try {
+      const googleRes = await fetch(`https://oauth2.googleapis.com/tokeninfo?id_token=${id_token}`);
+      if (googleRes.ok) {
+        const info = await googleRes.json();
+        if (info.iss === 'accounts.google.com' || info.iss === 'https://accounts.google.com') {
+          verifiedEmail = info.email;
+          verifiedName = info.name || verifiedName;
+        }
+      }
+    } catch (e) {
+      console.warn('Google ID token verification query failed:', e.message);
+    }
+  }
+
+  // 2. Verify Access Token via Google's userinfo API
   if (access_token) {
     try {
       const googleRes = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
@@ -139,12 +155,12 @@ router.post('/google', async (req, res) => {
         }
       }
     } catch (e) {
-      console.warn('Google token verification query failed:', e.message);
+      console.warn('Google access token verification query failed:', e.message);
     }
   }
 
   if (!verifiedEmail) {
-    return res.status(400).json({ error: 'Valid Google account credentials required.' });
+    return res.status(401).json({ error: 'Valid Google account credentials required.' });
   }
 
   const googleUsername = verifiedEmail.toLowerCase();

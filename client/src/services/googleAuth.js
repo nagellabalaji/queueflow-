@@ -1,28 +1,96 @@
 // Google OAuth 2.0 Integration via Google Identity Services (GIS)
 
-export const GOOGLE_CLIENT_ID =
-  (typeof import.meta !== 'undefined' && import.meta.env?.VITE_GOOGLE_CLIENT_ID) ||
-  '954608331828-p268j07f59d5kck6g148g82c1u1f1tqm.apps.googleusercontent.com';
+/**
+ * Retrieves the configured Google Client ID.
+ * Priority:
+ * 1. Vite Environment Variable: VITE_GOOGLE_CLIENT_ID
+ * 2. Window runtime global: window.QUEUEFLOW_GOOGLE_CLIENT_ID
+ * 3. LocalStorage override: queueflow_google_client_id
+ */
+export function getGoogleClientId() {
+  const envId = typeof import.meta !== 'undefined' && import.meta.env?.VITE_GOOGLE_CLIENT_ID;
+  if (envId && envId.trim() && !envId.includes('placeholder')) {
+    return envId.trim();
+  }
+
+  if (typeof window !== 'undefined') {
+    if (window.QUEUEFLOW_GOOGLE_CLIENT_ID && window.QUEUEFLOW_GOOGLE_CLIENT_ID.trim()) {
+      return window.QUEUEFLOW_GOOGLE_CLIENT_ID.trim();
+    }
+    const stored = localStorage.getItem('queueflow_google_client_id');
+    if (stored && stored.trim()) {
+      return stored.trim();
+    }
+  }
+
+  return '';
+}
+
+/**
+ * Saves a Google Client ID to localStorage for the session.
+ */
+export function setGoogleClientId(clientId) {
+  if (typeof window !== 'undefined' && clientId) {
+    localStorage.setItem('queueflow_google_client_id', clientId.trim());
+  }
+}
+
+/**
+ * Checks whether Google OAuth is configured with a non-empty client ID.
+ */
+export function isGoogleOAuthConfigured() {
+  const id = getGoogleClientId();
+  return Boolean(id && id.length > 10 && id.includes('.apps.googleusercontent.com'));
+}
+
+/**
+ * Ensures Google Identity Services (GIS) script is loaded.
+ */
+export async function ensureGoogleScriptLoaded() {
+  if (typeof window === 'undefined') return false;
+  if (window.google?.accounts?.oauth2) return true;
+  for (let i = 0; i < 25; i++) {
+    await new Promise((r) => setTimeout(r, 100));
+    if (window.google?.accounts?.oauth2) return true;
+  }
+  return Boolean(window.google?.accounts?.oauth2);
+}
 
 /**
  * Initiates REAL Google OAuth authentication.
  * Opens the official Google Account selection and sign-in screen.
- * Rejects if cancelled or closed; returns verified Google user profile upon success.
+ * Rejects if cancelled, closed, or invalid; returns verified Google user profile upon success.
  */
-export function initiateGoogleLogin() {
+export async function initiateGoogleLogin() {
+  const clientId = getGoogleClientId();
+
+  if (!clientId || !clientId.includes('.apps.googleusercontent.com')) {
+    const err = new Error('CONFIG_REQUIRED');
+    err.code = 'CONFIG_REQUIRED';
+    throw err;
+  }
+
+  await ensureGoogleScriptLoaded();
+
   return new Promise((resolve, reject) => {
-    // 1. Check if Google GIS SDK is loaded
+    // 1. Google Identity Services (GIS) Web SDK
     if (typeof window !== 'undefined' && window.google?.accounts?.oauth2) {
       try {
         const tokenClient = window.google.accounts.oauth2.initTokenClient({
-          client_id: GOOGLE_CLIENT_ID,
+          client_id: clientId,
           scope: 'openid email profile',
-          prompt: 'select_account', // Forces Google account chooser screen
+          prompt: 'select_account', // Forces Google to show the account picker
           callback: async (tokenResponse) => {
             if (tokenResponse.error) {
-              reject(new Error(tokenResponse.error_description || tokenResponse.error || 'Google authentication was cancelled.'));
+              const errMsg = tokenResponse.error_description || tokenResponse.error;
+              if (errMsg.includes('invalid_client') || tokenResponse.error === 'invalid_client') {
+                reject(new Error('Invalid Google Client ID. The OAuth client was not found in Google Cloud Console (Error 401: invalid_client).'));
+                return;
+              }
+              reject(new Error(errMsg || 'Google authentication was cancelled.'));
               return;
             }
+
             if (!tokenResponse.access_token) {
               reject(new Error('No authorization token received from Google.'));
               return;
@@ -55,11 +123,16 @@ export function initiateGoogleLogin() {
             }
           },
           error_callback: (error) => {
-            reject(new Error(error.message || 'Google account sign-in popup was closed or cancelled.'));
+            const errStr = error?.message || String(error);
+            if (errStr.includes('invalid_client')) {
+              reject(new Error('Invalid Google Client ID (Error 401: invalid_client). Verify this Client ID is registered in Google Cloud Console.'));
+              return;
+            }
+            reject(new Error(errStr || 'Google sign-in popup was closed or blocked.'));
           },
         });
 
-        // Request real access token from Google
+        // Open real Google account picker dialog
         tokenClient.requestAccessToken({ prompt: 'select_account' });
         return;
       } catch (err) {
@@ -70,7 +143,7 @@ export function initiateGoogleLogin() {
     // 2. Direct Google OAuth Popup Fallback (Standard OAuth 2.0 Web flow)
     const redirectUri = window.location.origin + window.location.pathname;
     const oauthUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${encodeURIComponent(
-      GOOGLE_CLIENT_ID
+      clientId
     )}&redirect_uri=${encodeURIComponent(
       redirectUri
     )}&response_type=token%20id_token&scope=openid%20email%20profile&prompt=select_account&nonce=${Date.now()}`;
@@ -90,7 +163,6 @@ export function initiateGoogleLogin() {
       return;
     }
 
-    // Monitor popup closure
     let isResolved = false;
     const checkTimer = setInterval(() => {
       try {
@@ -101,7 +173,7 @@ export function initiateGoogleLogin() {
           }
         }
       } catch (e) {
-        // Cross-origin checks may throw when navigating to accounts.google.com, which is normal
+        // Cross-origin checks during Google redirect are expected
       }
     }, 600);
   });

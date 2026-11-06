@@ -120,6 +120,9 @@ def login(req: LoginRequest):
         "manager": {"id": manager["id"], "username": manager["username"], "name": manager["name"]}
     }
 
+import urllib.request
+import json
+
 @app.post("/api/auth/demo")
 def demo_login():
     conn = get_db()
@@ -137,17 +140,49 @@ def demo_login():
 
 @app.post("/api/auth/google")
 def google_login(payload: dict = None):
-    if not payload or not (payload.get("email") or payload.get("access_token")):
-        raise HTTPException(status_code=400, detail="Google authentication required")
+    if not payload:
+        raise HTTPException(status_code=400, detail="Google authentication payload required")
+
+    id_token = payload.get("id_token")
+    access_token = payload.get("access_token")
+    verified_email = payload.get("email")
+    display_name = payload.get("name") or "Google Manager"
+
+    # Verify token with Google's official endpoints
+    if id_token:
+        try:
+            req_url = f"https://oauth2.googleapis.com/tokeninfo?id_token={id_token}"
+            with urllib.request.urlopen(req_url, timeout=5) as resp:
+                if resp.status == 200:
+                    data = json.loads(resp.read().decode("utf-8"))
+                    if data.get("iss") in ["accounts.google.com", "https://accounts.google.com"]:
+                        verified_email = data.get("email")
+                        display_name = data.get("name") or display_name
+        except Exception:
+            raise HTTPException(status_code=401, detail="Google ID token verification failed")
+    elif access_token:
+        try:
+            req = urllib.request.Request(
+                "https://www.googleapis.com/oauth2/v3/userinfo",
+                headers={"Authorization": f"Bearer {access_token}"}
+            )
+            with urllib.request.urlopen(req, timeout=5) as resp:
+                if resp.status == 200:
+                    data = json.loads(resp.read().decode("utf-8"))
+                    verified_email = data.get("email")
+                    display_name = data.get("name") or display_name
+        except Exception:
+            raise HTTPException(status_code=401, detail="Google access token verification failed")
+
+    if not verified_email:
+        raise HTTPException(status_code=401, detail="Verified Google account email is required")
 
     conn = get_db()
-    email = payload.get("email")
-    display_name = payload.get("name") or "Google Administrator"
-    username = email.lower() if email else f"google_{payload.get('google_id', 'user')}"
+    username = verified_email.lower().strip()
 
-    manager = conn.execute("SELECT * FROM managers WHERE username = ?", (username,)).fetchone()
+    manager = conn.execute("SELECT * FROM managers WHERE LOWER(username) = LOWER(?)", (username,)).fetchone()
     if not manager:
-        pwd_hash = hash_password(f"google_{datetime.now().timestamp()}")
+        pwd_hash = hash_password(f"oauth_google_{datetime.utcnow().timestamp()}")
         cur = conn.cursor()
         cur.execute("INSERT INTO managers (username, password_hash, name) VALUES (?, ?, ?)", (username, pwd_hash, display_name))
         conn.commit()
@@ -159,7 +194,7 @@ def google_login(payload: dict = None):
 
     token = create_access_token({"id": manager["id"], "username": manager["username"], "name": manager["name"]})
     return {
-        "message": "Google login successful",
+        "message": "Google authentication successful",
         "token": token,
         "manager": {"id": manager["id"], "username": manager["username"], "name": manager["name"]}
     }
