@@ -86,9 +86,9 @@ export default function ActiveServingCard({ servingToken, queue, onComplete, onR
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-5">
         {/* Token Info */}
         <div className="flex items-center gap-4">
-          <div className="flex flex-col items-center justify-center min-w-[115px] sm:min-w-[130px] px-3.5 py-2.5 rounded-xl bg-[#243447] border-2 border-[#4F807A]/50 text-white shadow-sm shrink-0">
+          <div className="flex flex-col items-center justify-center min-w-[115px] sm:min-w-[130px] px-3.5 py-2.5 rounded-xl bg-[#243447] border-2 border-[#FFB6C1]/40 text-white shadow-sm shrink-0">
             <span className="text-[9px] uppercase font-bold text-[#4F807A] tracking-wider whitespace-nowrap">NOW SERVING</span>
-            <span className="font-mono text-xl sm:text-2xl font-black text-white tracking-normal whitespace-nowrap py-0.5">
+            <span className="font-mono text-xl sm:text-2xl font-black text-[#FFB6C1] tracking-normal whitespace-nowrap py-0.5">
               {servingToken.token_code}
             </span>
             <span className="text-[9px] text-[#64866A] font-bold flex items-center gap-1.5 mt-0.5 whitespace-nowrap">
