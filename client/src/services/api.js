@@ -162,6 +162,22 @@ export const api = {
     (id, reason) => request(`/tokens/${id}/cancel`, { method: 'POST', body: JSON.stringify({ reason }) }),
     (id, reason) => mockStorage.cancelToken(id, reason)
   ),
+  recallToken: withFallback(
+    (id) => request(`/tokens/${id}/recall`, { method: 'POST' }),
+    (id) => mockStorage.recallToken(id)
+  ),
+  skipToken: withFallback(
+    (id) => request(`/tokens/${id}/skip`, { method: 'POST' }),
+    (id) => mockStorage.skipToken(id)
+  ),
+  publicGenerateToken: withFallback(
+    (data) => request('/tokens/public-generate', { method: 'POST', body: JSON.stringify(data) }),
+    (data) => mockStorage.publicGenerateToken(data)
+  ),
+  publicTrackToken: withFallback(
+    (code) => request(`/tokens/public-track/${encodeURIComponent(code)}`),
+    (code) => mockStorage.publicTrackToken(code)
+  ),
 
   // Analytics
   getAnalytics: withFallback(
@@ -170,5 +186,22 @@ export const api = {
       return request(`/analytics${query ? `?${query}` : ''}`);
     },
     () => mockStorage.getAnalytics()
+  ),
+  downloadExportCSV: withFallback(
+    async () => {
+      const token = localStorage.getItem('queueflow_token');
+      const res = await fetch('/api/analytics/export', {
+        headers: token ? { Authorization: `Bearer ${token}` } : {}
+      });
+      if (!res.ok) throw new Error('API_FAIL');
+      const blob = await res.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `queueflow_report_${new Date().toISOString().slice(0, 10)}.csv`;
+      a.click();
+      return { success: true };
+    },
+    () => mockStorage.downloadExportCSV()
   )
 };

@@ -363,6 +363,100 @@ def cancel_token(token_id: int, req: CancelTokenRequest = None, current_manager:
 
     return {"message": f"Token {cancelled['token_code']} cancelled", "token": dict(cancelled)}
 
+# Recall token (increments recall_count and re-announces)
+@app.post("/api/tokens/{token_id}/recall")
+def recall_token(token_id: int, current_manager: dict = Depends(get_current_manager)):
+    conn = get_db()
+    token = conn.execute("SELECT t.*, q.manager_id FROM tokens t JOIN queues q ON t.queue_id = q.id WHERE t.id = ?", (token_id,)).fetchone()
+    if not token or token["manager_id"] != current_manager["id"]:
+        conn.close()
+        raise HTTPException(status_code=404, detail="Token not found")
+
+    cur_recall = (token["recall_count"] or 0) + 1
+    conn.execute("UPDATE tokens SET recall_count = ? WHERE id = ?", (cur_recall, token_id))
+    conn.commit()
+    updated = conn.execute("SELECT * FROM tokens WHERE id = ?", (token_id,)).fetchone()
+    conn.close()
+
+    return {"message": f"Token {updated['token_code']} recalled (Call #{cur_recall})", "token": dict(updated)}
+
+# Skip token (moves down in queue)
+@app.post("/api/tokens/{token_id}/skip")
+def skip_token(token_id: int, current_manager: dict = Depends(get_current_manager)):
+    conn = get_db()
+    token = conn.execute("SELECT t.*, q.manager_id FROM tokens t JOIN queues q ON t.queue_id = q.id WHERE t.id = ?", (token_id,)).fetchone()
+    if not token or token["manager_id"] != current_manager["id"]:
+        conn.close()
+        raise HTTPException(status_code=404, detail="Token not found")
+
+    next_t = conn.execute("SELECT * FROM tokens WHERE queue_id = ? AND status = 'WAITING' AND position = ?", (token["queue_id"], token["position"] + 1)).fetchone()
+    if next_t:
+        conn.execute("UPDATE tokens SET position = ? WHERE id = ?", (token["position"] + 1, token["id"]))
+        conn.execute("UPDATE tokens SET position = ? WHERE id = ?", (token["position"], next_t["id"]))
+        conn.commit()
+    conn.close()
+    return {"message": f"Token {token['token_code']} skipped"}
+
+# Customer Self-Service: Public Token Generation
+@app.post("/api/tokens/public-generate", status_code=status.HTTP_201_CREATED)
+def public_generate_token(req: TokenCreateRequest):
+    conn = get_db()
+    queue = conn.execute("SELECT * FROM queues WHERE id = ? AND is_active = 1", (req.queue_id,)).fetchone()
+    if not queue:
+        conn.close()
+        raise HTTPException(status_code=404, detail="Active queue not found")
+
+    last = conn.execute("SELECT MAX(token_number) as max_num FROM tokens WHERE queue_id = ?", (req.queue_id,)).fetchone()
+    token_num = (last["max_num"] or 0) + 1
+    token_code = f"{queue['code_prefix']}-{token_num:03d}"
+
+    max_pos = conn.execute("SELECT MAX(position) as max_pos FROM tokens WHERE queue_id = ? AND status = 'WAITING'", (req.queue_id,)).fetchone()
+    next_pos = (max_pos["max_pos"] or 0) + 1
+
+    cur = conn.cursor()
+    cur.execute("""
+        INSERT INTO tokens (queue_id, token_number, token_code, customer_name, customer_phone, priority, status, position)
+        VALUES (?, ?, ?, ?, ?, ?, 'WAITING', ?)
+    """, (req.queue_id, token_num, token_code, req.customer_name.strip(), req.customer_phone, (req.priority or "NORMAL").upper(), next_pos))
+    conn.commit()
+    new_token = conn.execute("SELECT * FROM tokens WHERE id = ?", (cur.lastrowid,)).fetchone()
+    conn.close()
+
+    est_wait = max(1, (next_pos - 1) * 3)
+    return {
+        "message": f"Your Token {token_code} is confirmed!",
+        "token": dict(new_token),
+        "queue": {"id": queue["id"], "name": queue["name"], "counter_name": queue["counter_name"]},
+        "position": next_pos,
+        "estimatedWaitMinutes": est_wait
+    }
+
+# Customer Tracking: Check status of specific token code
+@app.get("/api/tokens/public-track/{code}")
+def public_track_token(code: str):
+    conn = get_db()
+    token = conn.execute("""
+        SELECT t.*, q.name as queue_name, q.counter_name
+        FROM tokens t
+        JOIN queues q ON t.queue_id = q.id
+        WHERE UPPER(t.token_code) = ?
+        ORDER BY t.created_at DESC LIMIT 1
+    """, (code.strip().upper(),)).fetchone()
+    conn.close()
+
+    if not token:
+        raise HTTPException(status_code=404, detail="Token not found")
+
+    people_ahead = max(0, (token["position"] or 1) - 1) if token["status"] == "WAITING" else 0
+    est_wait = max(2, people_ahead * 3) if token["status"] == "WAITING" else 0
+
+    return {
+        "token": dict(token),
+        "peopleAhead": people_ahead,
+        "estimatedWaitMinutes": est_wait,
+        "isNowServing": token["status"] == "IN_SERVICE"
+    }
+
 # ----------------- Analytics Dashboard (Requirement 8) -----------------
 @app.get("/api/analytics")
 def get_analytics(queue_id: Optional[int] = None, period: str = "all", current_manager: dict = Depends(get_current_manager)):
@@ -447,6 +541,40 @@ def get_analytics(queue_id: Optional[int] = None, period: str = "all", current_m
             {"name": "Cancelled", "value": cancelled_count, "color": "#EF4444"}
         ]
     }
+
+@app.get("/api/analytics/export")
+def export_analytics_csv(current_manager: dict = Depends(get_current_manager)):
+    from fastapi.responses import Response
+    conn = get_db()
+    tokens = conn.execute("""
+        SELECT 
+            t.token_code, t.customer_name, t.customer_phone, q.name as queue_name,
+            t.priority, t.status, t.position, t.wait_duration_seconds,
+            t.service_duration_seconds, t.counter_assigned, t.cancellation_reason,
+            t.created_at, t.service_started_at, t.service_ended_at
+        FROM tokens t
+        JOIN queues q ON t.queue_id = q.id
+        WHERE q.manager_id = ?
+        ORDER BY t.created_at DESC
+    """, (current_manager["id"],)).fetchall()
+    conn.close()
+
+    headers = [
+        "Token Code", "Customer Name", "Phone", "Queue Name", "Priority", "Status",
+        "Position", "Wait Time (sec)", "Service Time (sec)", "Counter",
+        "Cancellation Reason", "Created At", "Service Started At", "Service Ended At"
+    ]
+    lines = [",".join(headers)]
+    for t in tokens:
+        row = [f'"{str(val or "").replace(chr(34), chr(34)+chr(34))}"' for val in t]
+        lines.append(",".join(row))
+
+    csv_data = "\n".join(lines)
+    return Response(
+        content=csv_data,
+        media_type="text/csv",
+        headers={"Content-Disposition": f'attachment; filename="queueflow_report_{datetime.utcnow().strftime("%Y-%m-%d")}.csv"'}
+    )
 
 # ----------------- Serve Frontend Static Build -----------------
 dist_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "client", "dist"))

@@ -133,4 +133,82 @@ router.get('/', authenticateToken, (req, res) => {
   }
 });
 
+// Export CSV report of tokens
+router.get('/export', authenticateToken, (req, res) => {
+  try {
+    const managerId = req.manager.id;
+    const tokens = db.prepare(`
+      SELECT 
+        t.token_code,
+        t.customer_name,
+        t.customer_phone,
+        q.name as queue_name,
+        t.priority,
+        t.status,
+        t.position,
+        t.wait_duration_seconds,
+        t.service_duration_seconds,
+        t.counter_assigned,
+        t.cancellation_reason,
+        t.created_at,
+        t.service_started_at,
+        t.service_ended_at
+      FROM tokens t
+      JOIN queues q ON t.queue_id = q.id
+      WHERE q.manager_id = ?
+      ORDER BY t.created_at DESC
+    `).all(managerId);
+
+    const headers = [
+      'Token Code',
+      'Customer Name',
+      'Phone',
+      'Queue Name',
+      'Priority',
+      'Status',
+      'Position',
+      'Wait Time (sec)',
+      'Service Time (sec)',
+      'Counter',
+      'Cancellation Reason',
+      'Created At',
+      'Service Started At',
+      'Service Ended At'
+    ];
+
+    const escapeCsv = (val) => {
+      if (val === null || val === undefined) return '""';
+      const str = String(val).replace(/"/g, '""');
+      return `"${str}"`;
+    };
+
+    const csvRows = [headers.join(',')];
+    tokens.forEach((t) => {
+      csvRows.push([
+        escapeCsv(t.token_code),
+        escapeCsv(t.customer_name),
+        escapeCsv(t.customer_phone),
+        escapeCsv(t.queue_name),
+        escapeCsv(t.priority),
+        escapeCsv(t.status),
+        escapeCsv(t.position),
+        escapeCsv(t.wait_duration_seconds),
+        escapeCsv(t.service_duration_seconds),
+        escapeCsv(t.counter_assigned),
+        escapeCsv(t.cancellation_reason),
+        escapeCsv(t.created_at),
+        escapeCsv(t.service_started_at),
+        escapeCsv(t.service_ended_at)
+      ].join(','));
+    });
+
+    res.setHeader('Content-Type', 'text/csv');
+    res.setHeader('Content-Disposition', `attachment; filename="queueflow_report_${new Date().toISOString().slice(0, 10)}.csv"`);
+    res.send(csvRows.join('\n'));
+  } catch (error) {
+    console.error('Export error:', error);
+    res.status(500).json({ error: 'Failed to generate CSV export.' });
+  }
+});
+
 module.exports = router;

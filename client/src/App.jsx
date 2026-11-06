@@ -11,14 +11,15 @@ import WaitingQueueList from './components/WaitingQueueList';
 import RecentHistoryTable from './components/RecentHistoryTable';
 import AnalyticsDashboard from './components/AnalyticsDashboard';
 import PublicDisplayModal from './components/PublicDisplayModal';
+import CustomerKiosk from './components/CustomerKiosk';
 import CreateQueueModal from './components/CreateQueueModal';
 import AddTokenModal from './components/AddTokenModal';
 import CancelTokenModal from './components/CancelTokenModal';
-import { AlertCircle, CheckCircle, Info, Sparkles, Building2, Tv, Plus } from 'lucide-react';
+import { AlertCircle, CheckCircle, Info, Building2, Tv, Plus } from 'lucide-react';
 
 export default function App() {
   const { isAuthenticated, loading: authLoading } = useAuth();
-  const [activeTab, setActiveTab] = useState('queues'); // 'queues' | 'analytics' | 'kiosk'
+  const [activeTab, setActiveTab] = useState('queues'); // 'queues' | 'analytics' | 'customer' | 'kiosk'
   const [queues, setQueues] = useState([]);
   const [activeQueueId, setActiveQueueId] = useState(null);
   const [queueTokens, setQueueTokens] = useState({ waiting: [], serving: [], recentHistory: [] });
@@ -97,9 +98,7 @@ export default function App() {
     if (!activeQueueId) return;
 
     const unsubscribe = subscribeToQueue(activeQueueId, (event) => {
-      // Re-fetch current queue tokens
       fetchTokens(activeQueueId);
-      // Re-fetch queues summary counts
       fetchQueues(activeQueueId);
 
       if (event.action === 'TOKEN_SERVED' && event.payload) {
@@ -116,7 +115,7 @@ export default function App() {
     };
   }, [activeQueueId, fetchTokens, fetchQueues]);
 
-  // Handler: Assign top token for service (Requirement 6)
+  // Handler: Assign top token for service
   const handleServeNext = async (queueId) => {
     setActionLoading(true);
     try {
@@ -150,7 +149,7 @@ export default function App() {
     }
   };
 
-  // Handler: Move Token Up (Requirement 5)
+  // Handler: Move Token Up
   const handleMoveUp = async (tokenId) => {
     setActionLoading(true);
     try {
@@ -163,7 +162,7 @@ export default function App() {
     }
   };
 
-  // Handler: Move Token Down (Requirement 5)
+  // Handler: Move Token Down
   const handleMoveDown = async (tokenId) => {
     setActionLoading(true);
     try {
@@ -173,6 +172,32 @@ export default function App() {
       showToast(err.message || 'Failed to move token down', 'error');
     } finally {
       setActionLoading(false);
+    }
+  };
+
+  // Handler: Skip Token to End
+  const handleSkip = async (tokenId) => {
+    setActionLoading(true);
+    try {
+      const res = await api.skipToken(tokenId);
+      showToast(res.message || 'Token moved to end of queue', 'info');
+      await fetchTokens(activeQueueId);
+      await fetchQueues(activeQueueId);
+    } catch (err) {
+      showToast(err.message || 'Failed to skip token', 'error');
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  // Handler: Recall Token (Re-announce and increment counter)
+  const handleRecall = async (tokenId) => {
+    try {
+      const res = await api.recallToken(tokenId);
+      showToast(res.message || 'Token recalled', 'info');
+      await fetchTokens(activeQueueId);
+    } catch (err) {
+      console.warn('Recall error:', err);
     }
   };
 
@@ -210,10 +235,10 @@ export default function App() {
 
   if (authLoading) {
     return (
-      <div className="min-h-screen bg-slate-950 flex items-center justify-center text-slate-400">
+      <div className="min-h-screen bg-[#F7F6F2] flex items-center justify-center text-[#243447]">
         <div className="flex flex-col items-center gap-3">
-          <span className="w-8 h-8 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin" />
-          <span className="text-xs font-semibold tracking-wider uppercase">Loading QueueFlow...</span>
+          <span className="w-9 h-9 border-3 border-[#243447] border-t-transparent rounded-full animate-spin" />
+          <span className="text-xs font-black tracking-wider uppercase text-[#243447]">Loading QueueFlow...</span>
         </div>
       </div>
     );
@@ -227,14 +252,14 @@ export default function App() {
   const currentServingToken = queueTokens.serving.length > 0 ? queueTokens.serving[0] : null;
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col antialiased selection:bg-indigo-500 selection:text-white">
+    <div className="min-h-screen bg-[#F7F6F2] text-[#30343B] flex flex-col font-sans antialiased selection:bg-[#4F807A] selection:text-white">
       {/* Toast Notification */}
       {toast && (
-        <div className="fixed bottom-6 right-6 z-50 animate-slide-up flex items-center gap-2 px-4 py-3 rounded-xl border shadow-2xl backdrop-blur-md bg-slate-900/95 text-xs sm:text-sm font-medium border-slate-700">
-          {toast.type === 'error' && <AlertCircle className="w-4 h-4 text-rose-400 shrink-0" />}
-          {toast.type === 'success' && <CheckCircle className="w-4 h-4 text-emerald-400 shrink-0" />}
-          {toast.type === 'info' && <Info className="w-4 h-4 text-indigo-400 shrink-0" />}
-          <span className="text-slate-200">{toast.message}</span>
+        <div className="fixed bottom-6 right-6 z-50 animate-slide-up flex items-center gap-2.5 px-4 py-3 rounded-2xl border shadow-xl bg-white text-xs sm:text-sm font-bold border-[#E5E3DC]">
+          {toast.type === 'error' && <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />}
+          {toast.type === 'success' && <CheckCircle className="w-4 h-4 text-[#64866A] shrink-0" />}
+          {toast.type === 'info' && <Info className="w-4 h-4 text-[#4F807A] shrink-0" />}
+          <span className="text-[#243447]">{toast.message}</span>
         </div>
       )}
 
@@ -242,18 +267,20 @@ export default function App() {
       <Navbar activeTab={activeTab} setActiveTab={setActiveTab} />
 
       {/* Main Container */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 lg:px-8 py-3.5 sm:py-6">
+      <main className="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 lg:px-8 py-5 sm:py-7">
         {activeTab === 'analytics' ? (
           <AnalyticsDashboard queues={queues} />
+        ) : activeTab === 'customer' ? (
+          <CustomerKiosk queues={queues} />
         ) : activeTab === 'kiosk' ? (
           currentQueue ? (
             <PublicDisplayModal queue={currentQueue} onClose={() => setActiveTab('queues')} />
           ) : (
-            <div className="p-8 sm:p-12 text-center text-slate-400">Please create a queue first.</div>
+            <div className="p-8 sm:p-12 text-center text-[#30343B]/60">Please create a queue first.</div>
           )
         ) : (
           /* Operations & Queues View */
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-3.5 sm:gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 sm:gap-6">
             {/* Left Column: Queues Navigation (3 cols) */}
             <div className="lg:col-span-4 xl:col-span-3">
               <QueueSidebar
@@ -265,28 +292,28 @@ export default function App() {
             </div>
 
             {/* Right Column: Queue Operations (9 cols) */}
-            <div className="lg:col-span-8 xl:col-span-9 space-y-3.5 sm:space-y-6">
+            <div className="lg:col-span-8 xl:col-span-9 space-y-5">
               {currentQueue ? (
                 <>
                   {/* Queue Title Bar & Quick Actions */}
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 p-3.5 sm:p-5 bg-slate-900 border border-slate-800 rounded-2xl shadow-xl">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-indigo-600/20 border border-indigo-500/30 text-indigo-300 font-mono font-black text-base sm:text-lg flex items-center justify-center shrink-0">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 bg-white border border-[#E5E3DC] rounded-2xl shadow-sm">
+                    <div className="flex items-center gap-3.5">
+                      <div className="w-12 h-12 rounded-2xl bg-[#243447] text-white font-mono font-black text-lg flex items-center justify-center shrink-0 shadow-sm">
                         {currentQueue.code_prefix}
                       </div>
                       <div className="min-w-0">
                         <div className="flex items-center gap-2">
-                          <h1 className="text-base sm:text-xl font-bold text-white tracking-tight truncate">{currentQueue.name}</h1>
+                          <h1 className="text-lg sm:text-xl font-black text-[#243447] tracking-tight truncate">{currentQueue.name}</h1>
                         </div>
-                        <p className="text-[11px] sm:text-xs text-slate-400 mt-0.5 flex items-center gap-1.5 sm:gap-2 truncate">
-                          <span className="flex items-center gap-1 text-slate-300 shrink-0">
-                            <Building2 className="w-3.5 h-3.5 text-indigo-400" />
+                        <p className="text-xs text-[#30343B]/60 mt-0.5 flex items-center gap-2 truncate">
+                          <span className="flex items-center gap-1 font-semibold text-[#4F807A] shrink-0">
+                            <Building2 className="w-3.5 h-3.5 text-[#4F807A]" />
                             {currentQueue.counter_name || 'Counter 1'}
                           </span>
                           {currentQueue.description && (
                             <>
                               <span>•</span>
-                              <span className="truncate max-w-[160px] sm:max-w-xs">{currentQueue.description}</span>
+                              <span className="truncate max-w-[200px] sm:max-w-xs">{currentQueue.description}</span>
                             </>
                           )}
                         </p>
@@ -296,16 +323,16 @@ export default function App() {
                     <div className="flex items-center gap-2 self-end sm:self-center">
                       <button
                         onClick={() => setActiveTab('kiosk')}
-                        className="py-1.5 sm:py-2 px-2.5 sm:px-3 bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white rounded-xl border border-slate-700 text-xs font-semibold flex items-center gap-1.5 transition-colors"
-                        title="Open Fullscreen TV Monitor Display"
+                        className="py-2 px-3 bg-[#F7F6F2] hover:bg-[#E5E3DC] text-[#243447] rounded-xl border border-[#E5E3DC] text-xs font-bold flex items-center gap-1.5 transition-colors"
+                        title="Open TV Counter Display"
                       >
-                        <Tv className="w-3.5 h-3.5 text-indigo-400" />
+                        <Tv className="w-3.5 h-3.5 text-[#4F807A]" />
                         <span>TV Kiosk</span>
                       </button>
 
                       <button
                         onClick={() => setIsAddTokenOpen(true)}
-                        className="py-1.5 sm:py-2 px-3 sm:px-3.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-semibold shadow-md shadow-indigo-600/30 flex items-center gap-1.5 transition-all"
+                        className="py-2 px-3.5 bg-[#243447] hover:bg-[#1b2735] text-white rounded-xl text-xs font-bold shadow-xs flex items-center gap-1.5 transition-all"
                       >
                         <Plus className="w-3.5 h-3.5" />
                         <span>Add Person</span>
@@ -313,14 +340,15 @@ export default function App() {
                     </div>
                   </div>
 
-                  {/* Active Serving Card (Requirement 6) */}
+                  {/* Active Serving Card */}
                   <ActiveServingCard
                     servingToken={currentServingToken}
                     queue={currentQueue}
                     onComplete={handleCompleteToken}
+                    onRecall={handleRecall}
                   />
 
-                  {/* Waiting Queue List (Requirements 3, 4, 5, 6, 7) */}
+                  {/* Waiting Queue List */}
                   <WaitingQueueList
                     queue={currentQueue}
                     waitingTokens={queueTokens.waiting}
@@ -329,6 +357,7 @@ export default function App() {
                     onServeSpecific={handleServeSpecific}
                     onMoveUp={handleMoveUp}
                     onMoveDown={handleMoveDown}
+                    onSkip={handleSkip}
                     onOpenAddModal={() => setIsAddTokenOpen(true)}
                     onOpenCancelModal={(token) => setCancelModalToken(token)}
                     loadingAction={actionLoading}
@@ -338,12 +367,12 @@ export default function App() {
                   <RecentHistoryTable historyTokens={queueTokens.recentHistory} />
                 </>
               ) : (
-                <div className="p-12 text-center bg-slate-900 border border-slate-800 rounded-2xl">
-                  <h3 className="text-lg font-bold text-white mb-2">No Queues Available</h3>
-                  <p className="text-xs text-slate-400 mb-4">Create your first queue to start generating tokens and serving customers.</p>
+                <div className="p-12 text-center bg-white border border-[#E5E3DC] rounded-2xl shadow-sm">
+                  <h3 className="text-lg font-bold text-[#243447] mb-2">No Queues Available</h3>
+                  <p className="text-xs text-[#30343B]/60 mb-4">Create your first queue to start generating tokens and serving customers.</p>
                   <button
                     onClick={() => setIsCreateQueueOpen(true)}
-                    className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-medium text-xs rounded-xl shadow-lg shadow-indigo-600/30 inline-flex items-center gap-2"
+                    className="px-4 py-2.5 bg-[#243447] hover:bg-[#1b2735] text-white font-bold text-xs rounded-xl shadow-xs inline-flex items-center gap-2"
                   >
                     <Plus className="w-4 h-4" />
                     <span>Create Your First Queue</span>

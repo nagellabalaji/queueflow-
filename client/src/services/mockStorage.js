@@ -236,6 +236,81 @@ export const mockStorage = {
     saveState(state);
     return { message: `Token ${token.token_code} cancelled`, token };
   },
+  recallToken: async (id) => {
+    const state = loadState();
+    const token = state.tokens.find(t => t.id === Number(id));
+    if (token) {
+      token.recall_count = (token.recall_count || 0) + 1;
+      saveState(state);
+    }
+    return { message: `Token recalled (Call #${token?.recall_count || 1})`, token };
+  },
+  skipToken: async (id) => {
+    const state = loadState();
+    const token = state.tokens.find(t => t.id === Number(id));
+    if (token && token.status === 'WAITING') {
+      const nextToken = state.tokens.find(t => t.queue_id === token.queue_id && t.status === 'WAITING' && t.position === token.position + 1);
+      if (nextToken) {
+        nextToken.position = token.position;
+        token.position = token.position + 1;
+        saveState(state);
+      }
+    }
+    return { message: `Token ${token?.token_code} skipped to next position` };
+  },
+  publicGenerateToken: async (data) => {
+    return await mockStorage.addToken(data);
+  },
+  publicTrackToken: async (code) => {
+    const state = loadState();
+    const cleanCode = String(code).trim().toUpperCase();
+    const token = state.tokens.find(t => t.token_code.toUpperCase() === cleanCode);
+    if (!token) throw new Error('Token not found. Please check your token number.');
+
+    const queue = state.queues.find(q => q.id === token.queue_id) || state.queues[0];
+    const peopleAhead = token.status === 'WAITING' && token.position ? Math.max(0, token.position - 1) : 0;
+    const estimatedWaitMinutes = token.status === 'WAITING' ? Math.max(2, peopleAhead * 3) : 0;
+
+    return {
+      token: {
+        ...token,
+        queue_name: queue.name,
+        counter_name: queue.counter_name
+      },
+      peopleAhead,
+      estimatedWaitMinutes,
+      isNowServing: token.status === 'IN_SERVICE'
+    };
+  },
+  downloadExportCSV: async () => {
+    const state = loadState();
+    const headers = ['Token Code', 'Customer Name', 'Phone', 'Priority', 'Status', 'Position', 'Wait (sec)', 'Service (sec)', 'Counter', 'Cancellation Reason', 'Created At'];
+    const rows = [headers.join(',')];
+
+    state.tokens.forEach(t => {
+      rows.push([
+        `"${t.token_code}"`,
+        `"${t.customer_name}"`,
+        `"${t.customer_phone || ''}"`,
+        `"${t.priority}"`,
+        `"${t.status}"`,
+        `"${t.position || ''}"`,
+        `"${t.wait_duration_seconds || ''}"`,
+        `"${t.service_duration_seconds || ''}"`,
+        `"${t.counter_assigned || ''}"`,
+        `"${t.cancellation_reason || ''}"`,
+        `"${t.created_at}"`
+      ].join(','));
+    });
+
+    const csvBlob = new Blob([rows.join('\n')], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(csvBlob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `queueflow_report_${new Date().toISOString().slice(0, 10)}.csv`;
+    link.click();
+    return { success: true };
+  },
   getPublicQueue: async (queueId) => {
     const state = loadState();
     const qId = Number(queueId);

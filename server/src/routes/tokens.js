@@ -391,4 +391,171 @@ router.post('/:id/cancel', authenticateToken, (req, res) => {
   }
 });
 
+// Recall an in-service token (re-announces to counter & increments recall count)
+router.post('/:id/recall', authenticateToken, (req, res) => {
+  const tokenId = Number(req.params.id);
+
+  try {
+    const token = db.prepare(`
+      SELECT t.*, q.manager_id, q.counter_name as queue_counter
+      FROM tokens t
+      JOIN queues q ON t.queue_id = q.id
+      WHERE t.id = ?
+    `).get(tokenId);
+
+    if (!token || token.manager_id !== req.manager.id) {
+      return res.status(404).json({ error: 'Token not found.' });
+    }
+
+    if (token.status !== 'IN_SERVICE') {
+      return res.status(400).json({ error: 'Only in-service tokens can be recalled.' });
+    }
+
+    const currentRecall = (token.recall_count || 0) + 1;
+    db.prepare(`
+      UPDATE tokens
+      SET recall_count = ?
+      WHERE id = ?
+    `).run(currentRecall, tokenId);
+
+    const updated = db.prepare('SELECT * FROM tokens WHERE id = ?').get(tokenId);
+    emitQueueUpdate(token.queue_id, 'TOKEN_RECALLED', updated);
+
+    res.json({
+      message: `Token ${updated.token_code} recalled (Call #${currentRecall})`,
+      token: updated
+    });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to recall token.' });
+  }
+});
+
+// Skip a waiting token (moves down in queue)
+router.post('/:id/skip', authenticateToken, (req, res) => {
+  const tokenId = Number(req.params.id);
+
+  try {
+    const token = db.prepare(`
+      SELECT t.*, q.manager_id
+      FROM tokens t
+      JOIN queues q ON t.queue_id = q.id
+      WHERE t.id = ?
+    `).get(tokenId);
+
+    if (!token || token.manager_id !== req.manager.id) {
+      return res.status(404).json({ error: 'Token not found.' });
+    }
+
+    if (token.status !== 'WAITING') {
+      return res.status(400).json({ error: 'Only waiting tokens can be skipped.' });
+    }
+
+    // Move token to position 3 or swap with next
+    const nextToken = db.prepare(`
+      SELECT * FROM tokens WHERE queue_id = ? AND status = 'WAITING' AND position = ?
+    `).get(token.queue_id, token.position + 1);
+
+    if (nextToken) {
+      db.prepare('UPDATE tokens SET position = ? WHERE id = ?').run(token.position + 1, token.id);
+      db.prepare('UPDATE tokens SET position = ? WHERE id = ?').run(token.position, nextToken.id);
+    }
+
+    emitQueueUpdate(token.queue_id, 'TOKEN_SKIPPED', { tokenId });
+    res.json({ message: `Token ${token.token_code} skipped to next position.` });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to skip token.' });
+  }
+});
+
+// Customer Self-Service: Public Token Generation (No login required)
+router.post('/public-generate', (req, res) => {
+  const { queue_id, customer_name, customer_phone, priority } = req.body;
+
+  if (!queue_id || !customer_name || !customer_name.trim()) {
+    return res.status(400).json({ error: 'Queue and your name are required.' });
+  }
+
+  const queueId = Number(queue_id);
+  const queue = db.prepare('SELECT * FROM queues WHERE id = ? AND is_active = 1').get(queueId);
+  if (!queue) {
+    return res.status(404).json({ error: 'Selected queue is not active.' });
+  }
+
+  try {
+    const lastToken = db.prepare(`SELECT MAX(token_number) as max_num FROM tokens WHERE queue_id = ?`).get(queueId);
+    const tokenNumber = (lastToken && lastToken.max_num ? lastToken.max_num : 0) + 1;
+    const tokenCode = `${queue.code_prefix}-${String(tokenNumber).padStart(3, '0')}`;
+
+    const maxPos = db.prepare(`SELECT MAX(position) as max_pos FROM tokens WHERE queue_id = ? AND status = 'WAITING'`).get(queueId);
+    const nextPosition = (maxPos && maxPos.max_pos ? maxPos.max_pos : 0) + 1;
+
+    const result = db.prepare(`
+      INSERT INTO tokens (
+        queue_id, token_number, token_code, customer_name, customer_phone, priority, status, position
+      ) VALUES (?, ?, ?, ?, ?, ?, 'WAITING', ?)
+    `).run(
+      queueId,
+      tokenNumber,
+      tokenCode,
+      customer_name.trim(),
+      customer_phone ? customer_phone.trim() : null,
+      priority ? priority.toUpperCase() : 'NORMAL',
+      nextPosition
+    );
+
+    const newToken = db.prepare('SELECT * FROM tokens WHERE id = ?').get(Number(result.lastInsertRowid));
+    emitQueueUpdate(queueId, 'TOKEN_ADDED', newToken);
+
+    // Compute estimated wait time (~3 minutes per person ahead)
+    const estimatedWaitMinutes = Math.max(1, (nextPosition - 1) * 3);
+
+    res.status(201).json({
+      message: `Your Token ${tokenCode} is confirmed!`,
+      token: newToken,
+      queue: { id: queue.id, name: queue.name, counter_name: queue.counter_name },
+      position: nextPosition,
+      estimatedWaitMinutes
+    });
+  } catch (error) {
+    console.error('Public token creation error:', error);
+    res.status(500).json({ error: 'Failed to generate token.' });
+  }
+});
+
+// Customer Tracking: Check status of a specific token
+router.get('/public-track/:code', (req, res) => {
+  const code = req.params.code.trim().toUpperCase();
+
+  try {
+    const token = db.prepare(`
+      SELECT t.*, q.name as queue_name, q.counter_name
+      FROM tokens t
+      JOIN queues q ON t.queue_id = q.id
+      WHERE UPPER(t.token_code) = ?
+      ORDER BY t.created_at DESC LIMIT 1
+    `).get(code);
+
+    if (!token) {
+      return res.status(404).json({ error: 'Token not found. Please check your token number.' });
+    }
+
+    let peopleAhead = 0;
+    let estimatedWaitMinutes = 0;
+
+    if (token.status === 'WAITING' && token.position) {
+      peopleAhead = Math.max(0, token.position - 1);
+      estimatedWaitMinutes = Math.max(2, peopleAhead * 3);
+    }
+
+    res.json({
+      token,
+      peopleAhead,
+      estimatedWaitMinutes,
+      isNowServing: token.status === 'IN_SERVICE'
+    });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to look up token.' });
+  }
+});
+
 module.exports = router;

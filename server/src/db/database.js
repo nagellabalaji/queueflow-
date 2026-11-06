@@ -52,6 +52,7 @@ db.exec(`
     service_duration_seconds INTEGER,
     cancellation_reason TEXT,
     counter_assigned TEXT,
+    recall_count INTEGER DEFAULT 0,
     FOREIGN KEY (queue_id) REFERENCES queues(id) ON DELETE CASCADE
   );
 
@@ -59,5 +60,11 @@ db.exec(`
   CREATE INDEX IF NOT EXISTS idx_tokens_position ON tokens(queue_id, position);
   CREATE INDEX IF NOT EXISTS idx_tokens_created_at ON tokens(created_at);
 `);
+
+try {
+  db.exec('ALTER TABLE tokens ADD COLUMN recall_count INTEGER DEFAULT 0;');
+} catch (e) {
+  // column already exists
+}
 
 module.exports = db;
