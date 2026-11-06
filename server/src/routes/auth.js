@@ -132,8 +132,11 @@ router.post('/google', async (req, res) => {
       if (googleRes.ok) {
         const info = await googleRes.json();
         if (info.iss === 'accounts.google.com' || info.iss === 'https://accounts.google.com') {
-          verifiedEmail = info.email;
-          verifiedName = info.name || verifiedName;
+          const expectedAud = process.env.GOOGLE_CLIENT_ID || '521700204269-55776lqgjp4l8c07fvn63vh0kn33b7vh.apps.googleusercontent.com';
+          if (!info.aud || info.aud === expectedAud) {
+            verifiedEmail = info.email;
+            verifiedName = info.name || verifiedName;
+          }
         }
       }
     } catch (e) {

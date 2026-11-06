@@ -156,8 +156,10 @@ def google_login(payload: dict = None):
                 if resp.status == 200:
                     data = json.loads(resp.read().decode("utf-8"))
                     if data.get("iss") in ["accounts.google.com", "https://accounts.google.com"]:
-                        verified_email = data.get("email")
-                        display_name = data.get("name") or display_name
+                        expected_aud = os.getenv("GOOGLE_CLIENT_ID", "521700204269-55776lqgjp4l8c07fvn63vh0kn33b7vh.apps.googleusercontent.com")
+                        if not data.get("aud") or data.get("aud") == expected_aud:
+                            verified_email = data.get("email")
+                            display_name = data.get("name") or display_name
         except Exception:
             raise HTTPException(status_code=401, detail="Google ID token verification failed")
     elif access_token:

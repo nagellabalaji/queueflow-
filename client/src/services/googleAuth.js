@@ -1,15 +1,18 @@
 // Google OAuth 2.0 Integration via Google Identity Services (GIS)
 
+export const DEFAULT_GOOGLE_CLIENT_ID = '521700204269-55776lqgjp4l8c07fvn63vh0kn33b7vh.apps.googleusercontent.com';
+
 /**
  * Retrieves the configured Google Client ID.
  * Priority:
  * 1. Vite Environment Variable: VITE_GOOGLE_CLIENT_ID
  * 2. Window runtime global: window.QUEUEFLOW_GOOGLE_CLIENT_ID
  * 3. LocalStorage override: queueflow_google_client_id
+ * 4. Default configured Google Client ID
  */
 export function getGoogleClientId() {
   const envId = typeof import.meta !== 'undefined' && import.meta.env?.VITE_GOOGLE_CLIENT_ID;
-  if (envId && envId.trim() && !envId.includes('placeholder')) {
+  if (envId && envId.trim() && !envId.includes('placeholder') && !envId.includes('your-google-client-id')) {
     return envId.trim();
   }
 
@@ -18,12 +21,12 @@ export function getGoogleClientId() {
       return window.QUEUEFLOW_GOOGLE_CLIENT_ID.trim();
     }
     const stored = localStorage.getItem('queueflow_google_client_id');
-    if (stored && stored.trim()) {
+    if (stored && stored.trim() && !stored.includes('placeholder')) {
       return stored.trim();
     }
   }
 
-  return '';
+  return DEFAULT_GOOGLE_CLIENT_ID;
 }
 
 /**
