@@ -44,22 +44,22 @@ export default function CreateQueueModal({ isOpen, onClose, onQueueCreated }) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#243447]/60 backdrop-blur-xs animate-fade-in">
-      <div className="w-full max-w-lg bg-white border border-[#E5E3DC] rounded-2xl shadow-xl p-6 relative">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-xs animate-fade-in">
+      <div className="w-full max-w-lg bg-white border border-[#E2E8F0] rounded-2xl shadow-xl p-6 relative">
         <button
           onClick={onClose}
-          className="absolute top-5 right-5 text-[#30343B]/40 hover:text-[#243447] p-1 rounded-lg hover:bg-[#F7F6F2] transition-colors"
+          className="absolute top-5 right-5 text-[#64748B] hover:text-[#1E293B] p-1 rounded-lg hover:bg-[#F1F5F9] transition-colors"
         >
           <X className="w-5 h-5" />
         </button>
 
         <div className="flex items-center gap-3 mb-5">
-          <div className="w-10 h-10 rounded-xl bg-[#4F807A]/15 text-[#4F807A] flex items-center justify-center">
+          <div className="w-10 h-10 rounded-xl bg-[#EFF6FF] text-[#2563EB] border border-[#BFDBFE] flex items-center justify-center shadow-xs">
             <PlusCircle className="w-5 h-5" />
           </div>
           <div>
-            <h3 className="text-lg font-black text-[#243447]">Create New Service Queue</h3>
-            <p className="text-xs text-[#30343B]/60">Configure a department queue and dedicated counter</p>
+            <h3 className="text-lg font-black text-[#1E293B]">Create New Service Queue</h3>
+            <p className="text-xs text-[#64748B]">Configure a department queue and dedicated counter</p>
           </div>
         </div>
 
@@ -72,8 +72,8 @@ export default function CreateQueueModal({ isOpen, onClose, onQueueCreated }) {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-xs font-bold text-[#243447] uppercase tracking-wider mb-1.5">
-              Queue Name <span className="text-[#C98262]">*</span>
+            <label className="block text-xs font-bold text-[#1E293B] uppercase tracking-wider mb-1.5">
+              Queue Name <span className="text-rose-500">*</span>
             </label>
             <input
               type="text"
@@ -86,13 +86,13 @@ export default function CreateQueueModal({ isOpen, onClose, onQueueCreated }) {
                   setCodePrefix(e.target.value.substring(0, 3).toUpperCase().replace(/[^A-Z]/g, ''));
                 }
               }}
-              className="w-full bg-[#F7F6F2] border border-[#E5E3DC] rounded-xl px-3.5 py-2.5 text-sm font-semibold text-[#243447] placeholder-[#30343B]/40 focus:outline-none focus:border-[#4F807A] focus:ring-1 focus:ring-[#4F807A] transition-all"
+              className="w-full bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl px-3.5 py-2.5 text-sm font-semibold text-[#1E293B] placeholder-[#94A3B8] focus:outline-none focus:border-[#2563EB] focus:ring-1 focus:ring-[#2563EB] transition-all"
             />
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-bold text-[#243447] uppercase tracking-wider mb-1.5">
+              <label className="block text-xs font-bold text-[#1E293B] uppercase tracking-wider mb-1.5">
                 Token Code Prefix
               </label>
               <input
@@ -101,13 +101,13 @@ export default function CreateQueueModal({ isOpen, onClose, onQueueCreated }) {
                 placeholder="e.g. SUP, BIL, VIP"
                 value={codePrefix}
                 onChange={(e) => setCodePrefix(e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, ''))}
-                className="w-full bg-[#F7F6F2] border border-[#E5E3DC] rounded-xl px-3.5 py-2.5 text-sm font-bold text-[#243447] placeholder-[#30343B]/40 uppercase font-mono tracking-wider focus:outline-none focus:border-[#4F807A] focus:ring-1 focus:ring-[#4F807A] transition-all"
+                className="w-full bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl px-3.5 py-2.5 text-sm font-bold text-[#1E293B] placeholder-[#94A3B8] uppercase font-mono tracking-wider focus:outline-none focus:border-[#2563EB] focus:ring-1 focus:ring-[#2563EB] transition-all"
               />
-              <p className="text-[11px] text-[#30343B]/50 mt-1">Generates tokens like {codePrefix || 'Q'}-001</p>
+              <p className="text-[11px] text-[#64748B] mt-1">Generates tokens like {codePrefix || 'Q'}-001</p>
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-[#243447] uppercase tracking-wider mb-1.5">
+              <label className="block text-xs font-bold text-[#1E293B] uppercase tracking-wider mb-1.5">
                 Counter / Desk Name
               </label>
               <input
@@ -115,34 +115,34 @@ export default function CreateQueueModal({ isOpen, onClose, onQueueCreated }) {
                 placeholder="e.g. Counter 1, Desk A"
                 value={counterName}
                 onChange={(e) => setCounterName(e.target.value)}
-                className="w-full bg-[#F7F6F2] border border-[#E5E3DC] rounded-xl px-3.5 py-2.5 text-sm font-semibold text-[#243447] placeholder-[#30343B]/40 focus:outline-none focus:border-[#4F807A] focus:ring-1 focus:ring-[#4F807A] transition-all"
+                className="w-full bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl px-3.5 py-2.5 text-sm font-semibold text-[#1E293B] placeholder-[#94A3B8] focus:outline-none focus:border-[#2563EB] focus:ring-1 focus:ring-[#2563EB] transition-all"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-[#243447] uppercase tracking-wider mb-1.5">Description (Optional)</label>
+            <label className="block text-xs font-bold text-[#1E293B] uppercase tracking-wider mb-1.5">Description (Optional)</label>
             <textarea
               rows={2}
               placeholder="What types of services are handled at this desk?"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              className="w-full bg-[#F7F6F2] border border-[#E5E3DC] rounded-xl px-3.5 py-2 text-sm text-[#243447] placeholder-[#30343B]/40 focus:outline-none focus:border-[#4F807A] focus:ring-1 focus:ring-[#4F807A] transition-all resize-none"
+              className="w-full bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl px-3.5 py-2 text-sm text-[#1E293B] placeholder-[#94A3B8] focus:outline-none focus:border-[#2563EB] focus:ring-1 focus:ring-[#2563EB] transition-all resize-none"
             />
           </div>
 
-          <div className="flex items-center justify-end gap-3 pt-3 border-t border-[#E5E3DC]">
+          <div className="flex items-center justify-end gap-3 pt-3 border-t border-[#E2E8F0]">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 text-sm font-bold text-[#30343B]/60 hover:text-[#243447] rounded-xl hover:bg-[#F7F6F2] transition-colors"
+              className="px-4 py-2 text-sm font-bold text-[#64748B] hover:text-[#1E293B] rounded-xl hover:bg-[#F1F5F9] transition-colors"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={loading}
-              className="px-5 py-2.5 bg-[#243447] hover:bg-[#1b2735] text-white font-bold text-sm rounded-xl shadow-xs disabled:opacity-50 transition-all flex items-center gap-2"
+              className="px-5 py-2.5 bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-bold text-sm rounded-xl shadow-xs disabled:opacity-50 transition-all flex items-center gap-2"
             >
               {loading ? (
                 <span className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin" />

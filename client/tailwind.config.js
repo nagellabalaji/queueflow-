@@ -8,40 +8,40 @@ export default {
     extend: {
       colors: {
         primary: {
-          DEFAULT: '#243447',
-          hover: '#1B2735',
-          light: '#2F435C',
-          subtle: '#E9EEF3',
+          DEFAULT: '#2563EB',
+          hover: '#1D4ED8',
+          light: '#3B82F6',
+          subtle: '#EFF6FF',
         },
         secondary: {
-          DEFAULT: '#4F807A',
-          hover: '#416B66',
-          light: '#669690',
-          subtle: '#EDF5F4',
+          DEFAULT: '#0D9488',
+          hover: '#0F766E',
+          light: '#14B8A6',
+          subtle: '#F0FDFA',
         },
         accent: {
-          DEFAULT: '#C98262',
-          hover: '#B57051',
-          light: '#D8977B',
-          subtle: '#F9F1ED',
+          DEFAULT: '#F59E0B',
+          hover: '#D97706',
+          light: '#FBBF24',
+          subtle: '#FEF3C7',
         },
         success: {
-          DEFAULT: '#64866A',
-          hover: '#527057',
-          light: '#7B9E81',
-          subtle: '#EFF5F0',
+          DEFAULT: '#10B981',
+          hover: '#059669',
+          light: '#34D399',
+          subtle: '#ECFDF5',
         },
         surface: {
-          bg: '#F7F6F2',
+          bg: '#F8FAFC',
           card: '#FFFFFF',
-          muted: '#EFECE6',
-          border: '#E3E0D8',
-          darkborder: '#D0CDC4'
+          muted: '#F1F5F9',
+          border: '#E2E8F0',
+          darkborder: '#CBD5E1'
         },
         ink: {
-          primary: '#30343B',
-          secondary: '#5B626C',
-          muted: '#8B929C',
+          primary: '#1E293B',
+          secondary: '#64748B',
+          muted: '#94A3B8',
           inverted: '#FFFFFF'
         }
       },
@@ -50,9 +50,9 @@ export default {
         mono: ['JetBrains Mono', 'ui-monospace', 'monospace']
       },
       boxShadow: {
-        'subtle': '0 1px 3px 0 rgba(36, 52, 71, 0.05), 0 1px 2px -1px rgba(36, 52, 71, 0.05)',
-        'card': '0 4px 6px -1px rgba(36, 52, 71, 0.06), 0 2px 4px -2px rgba(36, 52, 71, 0.04)',
-        'elevated': '0 10px 15px -3px rgba(36, 52, 71, 0.08), 0 4px 6px -4px rgba(36, 52, 71, 0.04)',
+        'subtle': '0 1px 3px 0 rgba(30, 41, 59, 0.04), 0 1px 2px -1px rgba(30, 41, 59, 0.04)',
+        'card': '0 4px 6px -1px rgba(30, 41, 59, 0.05), 0 2px 4px -2px rgba(30, 41, 59, 0.03)',
+        'elevated': '0 10px 15px -3px rgba(30, 41, 59, 0.07), 0 4px 6px -4px rgba(30, 41, 59, 0.03)',
       },
       animation: {
         'fade-in': 'fadeIn 0.25s ease-out',

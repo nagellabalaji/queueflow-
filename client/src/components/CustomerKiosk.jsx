@@ -119,28 +119,28 @@ export default function CustomerKiosk({ queues = [] }) {
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       {/* Header Banner */}
-      <div className="bg-white border border-[#E5E3DC] rounded-2xl p-6 sm:p-8 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+      <div className="bg-white border border-[#E2E8F0] rounded-2xl p-6 sm:p-8 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#4F807A]/10 text-[#4F807A] font-semibold text-xs mb-2">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#EFF6FF] text-[#2563EB] font-semibold text-xs mb-2">
             <Ticket className="w-3.5 h-3.5" />
             <span>Customer Self-Service Kiosk</span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-black text-[#243447] tracking-tight">
+          <h1 className="text-2xl sm:text-3xl font-black text-[#1E293B] tracking-tight">
             QueueFlow Direct Service
           </h1>
-          <p className="text-sm text-[#30343B]/70 mt-1">
+          <p className="text-sm text-[#64748B] mt-1">
             Get your instant digital token, monitor real-time queue position, and arrive right on time.
           </p>
         </div>
 
         {/* Tab switch */}
-        <div className="flex bg-[#F7F6F2] p-1 rounded-xl border border-[#E5E3DC] self-stretch sm:self-auto">
+        <div className="flex bg-[#F1F5F9] p-1 rounded-xl border border-[#E2E8F0] self-stretch sm:self-auto">
           <button
             onClick={() => setActiveMode('generate')}
-            className={`flex-1 sm:flex-none px-4 py-2 rounded-lg font-bold text-xs transition-all flex items-center justify-center gap-1.5 ${
+            className={`flex-1 sm:flex-none px-4 py-2 rounded-lg font-bold text-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
               activeMode === 'generate'
-                ? 'bg-[#243447] text-white shadow-sm'
-                : 'text-[#30343B]/70 hover:text-[#243447]'
+                ? 'bg-[#2563EB] text-white shadow-xs'
+                : 'text-[#64748B] hover:text-[#1E293B]'
             }`}
           >
             <Ticket className="w-3.5 h-3.5" />
@@ -148,10 +148,10 @@ export default function CustomerKiosk({ queues = [] }) {
           </button>
           <button
             onClick={() => setActiveMode('track')}
-            className={`flex-1 sm:flex-none px-4 py-2 rounded-lg font-bold text-xs transition-all flex items-center justify-center gap-1.5 ${
+            className={`flex-1 sm:flex-none px-4 py-2 rounded-lg font-bold text-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
               activeMode === 'track'
-                ? 'bg-[#243447] text-white shadow-sm'
-                : 'text-[#30343B]/70 hover:text-[#243447]'
+                ? 'bg-[#2563EB] text-white shadow-xs'
+                : 'text-[#64748B] hover:text-[#1E293B]'
             }`}
           >
             <Search className="w-3.5 h-3.5" />
@@ -166,11 +166,11 @@ export default function CustomerKiosk({ queues = [] }) {
           {!generatedTicket ? (
             <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
               {/* Left Column: Form (7 cols) */}
-              <div className="md:col-span-7 bg-white border border-[#E5E3DC] rounded-2xl p-6 sm:p-7 shadow-sm">
-                <h2 className="text-lg font-bold text-[#243447] mb-1 flex items-center gap-2">
+              <div className="md:col-span-7 bg-white border border-[#E2E8F0] rounded-2xl p-6 sm:p-7 shadow-sm">
+                <h2 className="text-lg font-bold text-[#1E293B] mb-1 flex items-center gap-2">
                   <span>Take a Digital Ticket</span>
                 </h2>
-                <p className="text-xs text-[#30343B]/70 mb-5">
+                <p className="text-xs text-[#64748B] mb-5">
                   Select your department and provide your name to join the queue.
                 </p>
 
@@ -184,13 +184,13 @@ export default function CustomerKiosk({ queues = [] }) {
                 <form onSubmit={handleGenerate} className="space-y-4">
                   {/* Queue Selector */}
                   <div>
-                    <label className="block text-xs font-bold text-[#243447] uppercase tracking-wider mb-1.5">
-                      Select Department / Queue <span className="text-[#C98262]">*</span>
+                    <label className="block text-xs font-bold text-[#1E293B] uppercase tracking-wider mb-1.5">
+                      Select Department / Queue <span className="text-rose-500">*</span>
                     </label>
                     <select
                       value={selectedQueueId}
                       onChange={(e) => setSelectedQueueId(e.target.value)}
-                      className="w-full bg-[#F7F6F2] border border-[#E5E3DC] rounded-xl px-3.5 py-2.5 text-sm font-semibold text-[#243447] focus:outline-none focus:border-[#4F807A] focus:ring-1 focus:ring-[#4F807A] transition-all"
+                      className="w-full bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl px-3.5 py-2.5 text-sm font-semibold text-[#1E293B] focus:outline-none focus:border-[#2563EB] focus:ring-1 focus:ring-[#2563EB] transition-all"
                     >
                       {queues.map((q) => (
                         <option key={q.id} value={q.id}>
@@ -202,42 +202,42 @@ export default function CustomerKiosk({ queues = [] }) {
 
                   {/* Customer Name */}
                   <div>
-                    <label className="block text-xs font-bold text-[#243447] uppercase tracking-wider mb-1.5">
-                      Your Full Name <span className="text-[#C98262]">*</span>
+                    <label className="block text-xs font-bold text-[#1E293B] uppercase tracking-wider mb-1.5">
+                      Your Full Name <span className="text-rose-500">*</span>
                     </label>
                     <div className="relative">
-                      <User className="w-4 h-4 absolute left-3.5 top-3 text-[#30343B]/40" />
+                      <User className="w-4 h-4 absolute left-3.5 top-3 text-[#94A3B8]" />
                       <input
                         type="text"
                         required
                         placeholder="e.g. Alex Morgan"
                         value={customerName}
                         onChange={(e) => setCustomerName(e.target.value)}
-                        className="w-full bg-[#F7F6F2] border border-[#E5E3DC] rounded-xl pl-10 pr-3.5 py-2.5 text-sm text-[#30343B] placeholder-[#30343B]/40 focus:outline-none focus:border-[#4F807A] focus:ring-1 focus:ring-[#4F807A] transition-all"
+                        className="w-full bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl pl-10 pr-3.5 py-2.5 text-sm text-[#1E293B] placeholder-[#94A3B8] focus:outline-none focus:border-[#2563EB] focus:ring-1 focus:ring-[#2563EB] transition-all"
                       />
                     </div>
                   </div>
 
                   {/* Customer Phone */}
                   <div>
-                    <label className="block text-xs font-bold text-[#243447] uppercase tracking-wider mb-1.5">
+                    <label className="block text-xs font-bold text-[#1E293B] uppercase tracking-wider mb-1.5">
                       Mobile Number (For SMS Alert, Optional)
                     </label>
                     <div className="relative">
-                      <Phone className="w-4 h-4 absolute left-3.5 top-3 text-[#30343B]/40" />
+                      <Phone className="w-4 h-4 absolute left-3.5 top-3 text-[#94A3B8]" />
                       <input
                         type="tel"
                         placeholder="+1-555-0149"
                         value={customerPhone}
                         onChange={(e) => setCustomerPhone(e.target.value)}
-                        className="w-full bg-[#F7F6F2] border border-[#E5E3DC] rounded-xl pl-10 pr-3.5 py-2.5 text-sm text-[#30343B] placeholder-[#30343B]/40 focus:outline-none focus:border-[#4F807A] focus:ring-1 focus:ring-[#4F807A] transition-all"
+                        className="w-full bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl pl-10 pr-3.5 py-2.5 text-sm text-[#1E293B] placeholder-[#94A3B8] focus:outline-none focus:border-[#2563EB] focus:ring-1 focus:ring-[#2563EB] transition-all"
                       />
                     </div>
                   </div>
 
                   {/* Service Priority */}
                   <div>
-                    <label className="block text-xs font-bold text-[#243447] uppercase tracking-wider mb-1.5">
+                    <label className="block text-xs font-bold text-[#1E293B] uppercase tracking-wider mb-1.5">
                       Assistance Category
                     </label>
                     <div className="grid grid-cols-3 gap-2">
@@ -250,10 +250,10 @@ export default function CustomerKiosk({ queues = [] }) {
                           type="button"
                           key={item.id}
                           onClick={() => setPriority(item.id)}
-                          className={`py-2 px-2 rounded-xl text-xs font-bold border transition-all text-center ${
+                          className={`py-2 px-2 rounded-xl text-xs font-bold border transition-all text-center cursor-pointer ${
                             priority === item.id
-                              ? 'bg-[#243447] text-white border-[#243447]'
-                              : 'bg-[#F7F6F2] text-[#30343B]/70 border-[#E5E3DC] hover:border-[#4F807A]'
+                              ? 'bg-[#2563EB] text-white border-[#2563EB] shadow-xs'
+                              : 'bg-[#F8FAFC] text-[#64748B] border-[#E2E8F0] hover:border-[#2563EB]'
                           }`}
                         >
                           {item.label}
@@ -265,7 +265,7 @@ export default function CustomerKiosk({ queues = [] }) {
                   <button
                     type="submit"
                     disabled={generating || !customerName.trim()}
-                    className="w-full mt-2 py-3 px-4 bg-[#243447] hover:bg-[#1b2735] text-white font-bold text-sm rounded-xl shadow-md transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+                    className="w-full mt-2 py-3 px-4 bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-bold text-sm rounded-xl shadow-xs transition-all flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
                   >
                     {generating ? (
                       <span className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin" />
@@ -282,41 +282,41 @@ export default function CustomerKiosk({ queues = [] }) {
 
               {/* Right Column: Live Desk Summary Card (5 cols) */}
               <div className="md:col-span-5 space-y-4">
-                <div className="bg-[#243447] text-white rounded-2xl p-6 shadow-sm relative overflow-hidden">
+                <div className="bg-gradient-to-br from-[#EFF6FF] via-white to-[#EFF6FF] border border-[#BFDBFE] text-[#1E293B] rounded-2xl p-6 shadow-sm relative overflow-hidden">
                   <div className="relative z-10">
-                    <span className="text-[11px] uppercase tracking-wider font-bold text-[#4F807A] bg-white/10 px-2 py-0.5 rounded-md">
+                    <span className="text-[11px] uppercase tracking-wider font-bold text-[#2563EB] bg-white border border-[#BFDBFE] px-2.5 py-0.5 rounded-md">
                       Selected Queue
                     </span>
-                    <h3 className="text-xl font-bold mt-2">{selectedQueue?.name || 'General Service'}</h3>
-                    <p className="text-xs text-white/70 mt-1 flex items-center gap-1.5">
-                      <Building2 className="w-3.5 h-3.5 text-[#4F807A]" />
+                    <h3 className="text-xl font-black mt-2 text-[#1E293B]">{selectedQueue?.name || 'General Service'}</h3>
+                    <p className="text-xs text-[#64748B] mt-1 flex items-center gap-1.5 font-semibold">
+                      <Building2 className="w-3.5 h-3.5 text-[#2563EB]" />
                       <span>{selectedQueue?.counter_name || 'Counter 1'}</span>
                     </p>
 
-                    <div className="grid grid-cols-2 gap-3 mt-6 pt-5 border-t border-white/10">
+                    <div className="grid grid-cols-2 gap-3 mt-6 pt-5 border-t border-[#BFDBFE]/60">
                       <div>
-                        <span className="text-[10px] uppercase font-bold text-white/50">Currently In Line</span>
-                        <div className="text-2xl font-black text-white mt-0.5">
+                        <span className="text-[10px] uppercase font-bold text-[#64748B]">Currently In Line</span>
+                        <div className="text-2xl font-black text-[#2563EB] mt-0.5">
                           {selectedQueue?.waiting_count || 0}
                         </div>
                       </div>
                       <div>
-                        <span className="text-[10px] uppercase font-bold text-white/50">Estimated Wait</span>
-                        <div className="text-2xl font-black text-[#C98262] mt-0.5">
-                          ~{(selectedQueue?.waiting_count || 0) * 3 || 3} <span className="text-xs font-normal text-white/60">mins</span>
+                        <span className="text-[10px] uppercase font-bold text-[#64748B]">Estimated Wait</span>
+                        <div className="text-2xl font-black text-amber-600 mt-0.5">
+                          ~{(selectedQueue?.waiting_count || 0) * 3 || 3} <span className="text-xs font-normal text-[#64748B]">mins</span>
                         </div>
                       </div>
                     </div>
                   </div>
                 </div>
 
-                <div className="bg-white border border-[#E5E3DC] rounded-2xl p-5 text-xs text-[#30343B]/70 space-y-2.5">
+                <div className="bg-white border border-[#E2E8F0] rounded-2xl p-5 text-xs text-[#64748B] space-y-2.5">
                   <div className="flex items-start gap-2.5">
-                    <ShieldCheck className="w-4 h-4 text-[#64866A] shrink-0 mt-0.5" />
+                    <ShieldCheck className="w-4 h-4 text-[#10B981] shrink-0 mt-0.5" />
                     <span>Your token is guaranteed and strictly preserved in fair first-come, first-served order.</span>
                   </div>
                   <div className="flex items-start gap-2.5">
-                    <Clock className="w-4 h-4 text-[#4F807A] shrink-0 mt-0.5" />
+                    <Clock className="w-4 h-4 text-[#2563EB] shrink-0 mt-0.5" />
                     <span>Real-time voice announcements call each ticket aloud at the counter screen.</span>
                   </div>
                 </div>
@@ -324,41 +324,41 @@ export default function CustomerKiosk({ queues = [] }) {
             </div>
           ) : (
             /* Digital Ticket Generated View */
-            <div className="bg-white border-2 border-[#4F807A]/40 rounded-3xl p-6 sm:p-10 shadow-lg text-center max-w-lg mx-auto relative overflow-hidden animate-slide-up">
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#64866A]/10 text-[#64866A] font-bold text-xs uppercase tracking-wider mb-3">
+            <div className="bg-white border-2 border-[#2563EB]/40 rounded-3xl p-6 sm:p-10 shadow-lg text-center max-w-lg mx-auto relative overflow-hidden animate-slide-up">
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#ECFDF5] text-[#10B981] font-bold text-xs uppercase tracking-wider mb-3">
                 <CheckCircle2 className="w-4 h-4" />
                 <span>Ticket Issued Successfully</span>
               </div>
 
               <div className="my-4">
-                <span className="text-xs font-bold text-[#30343B]/60 uppercase tracking-widest">Your Token Number</span>
-                <div className="font-mono text-5xl sm:text-6xl font-black text-[#243447] tracking-tight my-2">
+                <span className="text-xs font-bold text-[#64748B] uppercase tracking-widest">Your Token Number</span>
+                <div className="font-mono text-5xl sm:text-6xl font-black text-[#2563EB] tracking-tight my-2">
                   {generatedTicket.token_code}
                 </div>
-                <div className="text-lg font-bold text-[#243447]">
+                <div className="text-lg font-bold text-[#1E293B]">
                   {generatedTicket.customer_name}
                 </div>
               </div>
 
               {/* Status Badges */}
-              <div className="grid grid-cols-2 gap-3 max-w-xs mx-auto my-6 p-3.5 bg-[#F7F6F2] border border-[#E5E3DC] rounded-2xl text-left">
+              <div className="grid grid-cols-2 gap-3 max-w-xs mx-auto my-6 p-3.5 bg-[#F8FAFC] border border-[#E2E8F0] rounded-2xl text-left">
                 <div>
-                  <span className="text-[10px] uppercase font-bold text-[#30343B]/50">Position in Line</span>
-                  <div className="font-mono text-xl font-black text-[#243447]">
+                  <span className="text-[10px] uppercase font-bold text-[#64748B]">Position in Line</span>
+                  <div className="font-mono text-xl font-black text-[#2563EB]">
                     #{generatedTicket.position || 1}
                   </div>
                 </div>
                 <div>
-                  <span className="text-[10px] uppercase font-bold text-[#30343B]/50">Estimated Wait</span>
-                  <div className="text-xl font-black text-[#C98262]">
+                  <span className="text-[10px] uppercase font-bold text-[#64748B]">Estimated Wait</span>
+                  <div className="text-xl font-black text-amber-600">
                     ~{generatedTicket.estimated_wait_minutes || 3} mins
                   </div>
                 </div>
               </div>
 
-              <div className="text-xs text-[#30343B]/70 space-y-1 mb-6">
+              <div className="text-xs text-[#64748B] space-y-1 mb-6">
                 <p>
-                  Service Desk: <strong className="text-[#243447]">{generatedTicket.counter_name || selectedQueue?.counter_name || 'Counter 1'}</strong>
+                  Service Desk: <strong className="text-[#1E293B]">{generatedTicket.counter_name || selectedQueue?.counter_name || 'Counter 1'}</strong>
                 </p>
                 <p>Please keep this screen open or remember your token code.</p>
               </div>
@@ -367,9 +367,9 @@ export default function CustomerKiosk({ queues = [] }) {
               <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
                 <button
                   onClick={() => window.print()}
-                  className="w-full sm:w-auto px-5 py-2.5 bg-white border border-[#E5E3DC] hover:border-[#243447] text-[#243447] font-bold text-xs rounded-xl transition-all flex items-center justify-center gap-1.5 shadow-sm"
+                  className="w-full sm:w-auto px-5 py-2.5 bg-white border border-[#E2E8F0] hover:border-[#2563EB] text-[#1E293B] font-bold text-xs rounded-xl transition-all flex items-center justify-center gap-1.5 shadow-xs cursor-pointer"
                 >
-                  <Printer className="w-4 h-4" />
+                  <Printer className="w-4 h-4 text-[#2563EB]" />
                   <span>Print Ticket</span>
                 </button>
                 <button
@@ -377,7 +377,7 @@ export default function CustomerKiosk({ queues = [] }) {
                     setActiveMode('track');
                     handleTrack(generatedTicket.token_code);
                   }}
-                  className="w-full sm:w-auto px-5 py-2.5 bg-[#4F807A] hover:bg-[#3d6560] text-white font-bold text-xs rounded-xl transition-all flex items-center justify-center gap-1.5 shadow-sm"
+                  className="w-full sm:w-auto px-5 py-2.5 bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-bold text-xs rounded-xl transition-all flex items-center justify-center gap-1.5 shadow-xs cursor-pointer"
                 >
                   <Search className="w-4 h-4" />
                   <span>Track Live Position</span>
@@ -387,7 +387,7 @@ export default function CustomerKiosk({ queues = [] }) {
                     setGeneratedTicket(null);
                     setCustomerName('');
                   }}
-                  className="w-full sm:w-auto px-4 py-2.5 text-[#30343B]/60 hover:text-[#243447] text-xs font-semibold"
+                  className="w-full sm:w-auto px-4 py-2.5 text-[#64748B] hover:text-[#1E293B] text-xs font-semibold cursor-pointer"
                 >
                   Issue Another
                 </button>
@@ -399,13 +399,13 @@ export default function CustomerKiosk({ queues = [] }) {
 
       {/* Mode 2: Track Token */}
       {activeMode === 'track' && (
-        <div className="bg-white border border-[#E5E3DC] rounded-2xl p-6 sm:p-8 shadow-sm max-w-xl mx-auto space-y-6">
+        <div className="bg-white border border-[#E2E8F0] rounded-2xl p-6 sm:p-8 shadow-sm max-w-xl mx-auto space-y-6">
           <div>
-            <h2 className="text-lg font-bold text-[#243447] mb-1 flex items-center gap-2">
-              <Search className="w-5 h-5 text-[#4F807A]" />
+            <h2 className="text-lg font-bold text-[#1E293B] mb-1 flex items-center gap-2">
+              <Search className="w-5 h-5 text-[#2563EB]" />
               <span>Track Your Queue Position</span>
             </h2>
-            <p className="text-xs text-[#30343B]/70">
+            <p className="text-xs text-[#64748B]">
               Enter your token number below to see your current place in line and serving status.
             </p>
           </div>
@@ -423,13 +423,13 @@ export default function CustomerKiosk({ queues = [] }) {
                 placeholder="e.g. SUP-001 or BIL-003"
                 value={trackCode}
                 onChange={(e) => setTrackCode(e.target.value.toUpperCase())}
-                className="w-full uppercase font-mono font-bold bg-[#F7F6F2] border border-[#E5E3DC] rounded-xl px-4 py-2.5 text-sm text-[#243447] focus:outline-none focus:border-[#4F807A] focus:ring-1 focus:ring-[#4F807A] transition-all"
+                className="w-full uppercase font-mono font-bold bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl px-4 py-2.5 text-sm text-[#1E293B] focus:outline-none focus:border-[#2563EB] focus:ring-1 focus:ring-[#2563EB] transition-all"
               />
             </div>
             <button
               type="submit"
               disabled={tracking || !trackCode.trim()}
-              className="py-2.5 px-5 bg-[#243447] hover:bg-[#1b2735] text-white font-bold text-sm rounded-xl transition-all flex items-center gap-1.5 disabled:opacity-50"
+              className="py-2.5 px-5 bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-bold text-sm rounded-xl transition-all flex items-center gap-1.5 disabled:opacity-50 cursor-pointer shadow-xs"
             >
               {tracking ? (
                 <RefreshCw className="w-4 h-4 animate-spin" />
@@ -447,29 +447,29 @@ export default function CustomerKiosk({ queues = [] }) {
           )}
 
           {trackedTicket && (
-            <div className="border border-[#E5E3DC] rounded-2xl p-5 bg-[#F7F6F2] space-y-4 animate-fade-in">
-              <div className="flex items-center justify-between border-b border-[#E5E3DC] pb-3">
+            <div className="border border-[#E2E8F0] rounded-2xl p-5 bg-[#F8FAFC] space-y-4 animate-fade-in">
+              <div className="flex items-center justify-between border-b border-[#E2E8F0] pb-3">
                 <div>
-                  <span className="font-mono text-2xl font-black text-[#243447]">
+                  <span className="font-mono text-2xl font-black text-[#2563EB]">
                     {trackedTicket.token.token_code}
                   </span>
-                  <div className="text-xs font-semibold text-[#30343B]">
+                  <div className="text-xs font-semibold text-[#1E293B]">
                     {trackedTicket.token.customer_name}
                   </div>
                 </div>
 
                 <div>
                   {trackedTicket.status === 'SERVING' ? (
-                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#64866A] text-white font-bold text-xs uppercase animate-pulse">
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#10B981] text-white font-bold text-xs uppercase animate-pulse">
                       <span className="w-2 h-2 rounded-full bg-white" />
                       Now Serving!
                     </span>
                   ) : trackedTicket.status === 'WAITING' ? (
-                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#243447] text-white font-bold text-xs uppercase">
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#2563EB] text-white font-bold text-xs uppercase">
                       Waiting
                     </span>
                   ) : trackedTicket.status === 'COMPLETED' ? (
-                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#4F807A]/20 text-[#4F807A] font-bold text-xs uppercase">
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#ECFDF5] text-[#10B981] border border-[#A7F3D0] font-bold text-xs uppercase">
                       Completed
                     </span>
                   ) : (
@@ -481,36 +481,36 @@ export default function CustomerKiosk({ queues = [] }) {
               </div>
 
               {trackedTicket.status === 'SERVING' && (
-                <div className="p-3 bg-[#64866A]/10 border border-[#64866A]/30 rounded-xl text-xs font-bold text-[#64866A] text-center">
+                <div className="p-3 bg-[#ECFDF5] border border-[#A7F3D0] rounded-xl text-xs font-bold text-[#10B981] text-center">
                   🔔 Please proceed immediately to {trackedTicket.token.counter_assigned || trackedTicket.queue?.counter_name || 'Counter 1'}!
                 </div>
               )}
 
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                <div className="bg-white p-3 rounded-xl border border-[#E5E3DC]">
-                  <span className="text-[10px] uppercase font-bold text-[#30343B]/50">Position</span>
-                  <div className="font-mono text-lg font-black text-[#243447]">
+                <div className="bg-white p-3 rounded-xl border border-[#E2E8F0]">
+                  <span className="text-[10px] uppercase font-bold text-[#64748B]">Position</span>
+                  <div className="font-mono text-lg font-black text-[#2563EB]">
                     {trackedTicket.position ? `#${trackedTicket.position}` : '---'}
                   </div>
                 </div>
 
-                <div className="bg-white p-3 rounded-xl border border-[#E5E3DC]">
-                  <span className="text-[10px] uppercase font-bold text-[#30343B]/50">Est. Wait</span>
-                  <div className="text-lg font-black text-[#C98262]">
+                <div className="bg-white p-3 rounded-xl border border-[#E2E8F0]">
+                  <span className="text-[10px] uppercase font-bold text-[#64748B]">Est. Wait</span>
+                  <div className="text-lg font-black text-amber-600">
                     {trackedTicket.estimatedWaitMinutes ? `~${trackedTicket.estimatedWaitMinutes}m` : '0m'}
                   </div>
                 </div>
 
-                <div className="bg-white p-3 rounded-xl border border-[#E5E3DC] col-span-2 sm:col-span-1">
-                  <span className="text-[10px] uppercase font-bold text-[#30343B]/50">Counter</span>
-                  <div className="text-sm font-bold text-[#4F807A] truncate">
+                <div className="bg-white p-3 rounded-xl border border-[#E2E8F0] col-span-2 sm:col-span-1">
+                  <span className="text-[10px] uppercase font-bold text-[#64748B]">Counter</span>
+                  <div className="text-sm font-bold text-[#2563EB] truncate">
                     {trackedTicket.queue?.counter_name || 'Counter 1'}
                   </div>
                 </div>
               </div>
 
-              <div className="text-[11px] text-[#30343B]/60 text-center flex items-center justify-center gap-1">
-                <RefreshCw className="w-3 h-3 text-[#4F807A]" />
+              <div className="text-[11px] text-[#64748B] text-center flex items-center justify-center gap-1">
+                <RefreshCw className="w-3 h-3 text-[#2563EB]" />
                 <span>Auto-refreshing every 10 seconds</span>
               </div>
             </div>

@@ -14,16 +14,16 @@ export default function RecentHistoryTable({ historyTokens }) {
   };
 
   return (
-    <div className="bg-white border border-[#E5E3DC] rounded-2xl p-5 shadow-sm space-y-4">
+    <div className="bg-white border border-[#E2E8F0] rounded-2xl p-4 sm:p-5 shadow-sm space-y-4">
       <div className="flex items-center gap-2">
-        <History className="w-4 h-4 text-[#4F807A]" />
-        <h4 className="text-sm font-bold text-[#243447]">Recent Queue Activity & History</h4>
+        <History className="w-4 h-4 text-[#2563EB]" />
+        <h4 className="text-sm font-bold text-[#1E293B]">Recent Queue Activity & History</h4>
       </div>
 
       <div className="overflow-x-auto">
         <table className="w-full text-left text-xs">
           <thead>
-            <tr className="border-b border-[#E5E3DC] text-[#30343B]/60">
+            <tr className="border-b border-[#E2E8F0] text-[#64748B]">
               <th className="pb-2.5 font-bold uppercase tracking-wider">Token</th>
               <th className="pb-2.5 font-bold uppercase tracking-wider">Customer</th>
               <th className="pb-2.5 font-bold uppercase tracking-wider">Status</th>
@@ -32,20 +32,20 @@ export default function RecentHistoryTable({ historyTokens }) {
               <th className="pb-2.5 font-bold uppercase tracking-wider">Details / Reason</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-[#E5E3DC] text-[#30343B]">
+          <tbody className="divide-y divide-[#E2E8F0] text-[#1E293B]">
             {historyTokens.map((token) => {
               const isCompleted = token.status === 'COMPLETED';
               return (
-                <tr key={token.id} className="hover:bg-[#F7F6F2] transition-colors">
-                  <td className="py-2.5 font-mono font-black text-[#243447]">
+                <tr key={token.id} className="hover:bg-[#F8FAFC] transition-colors">
+                  <td className="py-2.5 font-mono font-black text-[#2563EB]">
                     {token.token_code}
                   </td>
-                  <td className="py-2.5 font-bold text-[#243447]">
+                  <td className="py-2.5 font-bold text-[#1E293B]">
                     {token.customer_name}
                   </td>
                   <td className="py-2.5">
                     {isCompleted ? (
-                      <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[#64866A]/10 text-[#64866A] border border-[#64866A]/20 text-[10px] font-bold">
+                      <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[#ECFDF5] text-[#10B981] border border-[#A7F3D0] text-[10px] font-bold">
                         <CheckCircle2 className="w-3 h-3" />
                         COMPLETED
                       </span>
@@ -56,13 +56,13 @@ export default function RecentHistoryTable({ historyTokens }) {
                       </span>
                     )}
                   </td>
-                  <td className="py-2.5 font-mono text-[#30343B]/70">
+                  <td className="py-2.5 font-mono text-[#64748B]">
                     {formatSeconds(token.wait_duration_seconds)}
                   </td>
-                  <td className="py-2.5 font-mono text-[#30343B]/70">
+                  <td className="py-2.5 font-mono text-[#64748B]">
                     {formatSeconds(token.service_duration_seconds)}
                   </td>
-                  <td className="py-2.5 text-[#30343B]/70 max-w-xs truncate">
+                  <td className="py-2.5 text-[#64748B] max-w-xs truncate">
                     {token.cancellation_reason || (token.counter_assigned ? `Served at ${token.counter_assigned}` : 'Completed successfully')}
                   </td>
                 </tr>

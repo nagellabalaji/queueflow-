@@ -235,10 +235,10 @@ export default function App() {
 
   if (authLoading) {
     return (
-      <div className="min-h-screen bg-[#F7F6F2] flex items-center justify-center text-[#243447]">
+      <div className="min-h-screen bg-[#F8FAFC] flex items-center justify-center text-[#1E293B]">
         <div className="flex flex-col items-center gap-3">
-          <span className="w-9 h-9 border-3 border-[#243447] border-t-transparent rounded-full animate-spin" />
-          <span className="text-xs font-black tracking-wider uppercase text-[#243447]">Loading QueueFlow...</span>
+          <span className="w-9 h-9 border-3 border-[#2563EB] border-t-transparent rounded-full animate-spin" />
+          <span className="text-xs font-black tracking-wider uppercase text-[#1E293B]">Loading QueueFlow...</span>
         </div>
       </div>
     );
@@ -252,14 +252,14 @@ export default function App() {
   const currentServingToken = queueTokens.serving.length > 0 ? queueTokens.serving[0] : null;
 
   return (
-    <div className="min-h-screen bg-[#F7F6F2] text-[#30343B] flex flex-col font-sans antialiased selection:bg-[#4F807A] selection:text-white">
+    <div className="min-h-screen bg-[#F8FAFC] text-[#1E293B] flex flex-col font-sans antialiased selection:bg-[#2563EB] selection:text-white">
       {/* Toast Notification */}
       {toast && (
-        <div className="fixed bottom-6 right-6 z-50 animate-slide-up flex items-center gap-2.5 px-4 py-3 rounded-2xl border shadow-xl bg-white text-xs sm:text-sm font-bold border-[#E5E3DC]">
+        <div className="fixed bottom-6 right-6 z-50 animate-slide-up flex items-center gap-2.5 px-4 py-3 rounded-2xl border shadow-xl bg-white text-xs sm:text-sm font-bold border-[#E2E8F0]">
           {toast.type === 'error' && <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />}
-          {toast.type === 'success' && <CheckCircle className="w-4 h-4 text-[#64866A] shrink-0" />}
-          {toast.type === 'info' && <Info className="w-4 h-4 text-[#4F807A] shrink-0" />}
-          <span className="text-[#243447]">{toast.message}</span>
+          {toast.type === 'success' && <CheckCircle className="w-4 h-4 text-emerald-600 shrink-0" />}
+          {toast.type === 'info' && <Info className="w-4 h-4 text-[#2563EB] shrink-0" />}
+          <span className="text-[#1E293B]">{toast.message}</span>
         </div>
       )}
 
@@ -276,7 +276,7 @@ export default function App() {
           currentQueue ? (
             <PublicDisplayModal queue={currentQueue} onClose={() => setActiveTab('queues')} />
           ) : (
-            <div className="p-8 sm:p-12 text-center text-[#30343B]/60">Please create a queue first.</div>
+            <div className="p-8 sm:p-12 text-center text-[#64748B]">Please create a queue first.</div>
           )
         ) : (
           /* Operations & Queues View */
@@ -296,18 +296,18 @@ export default function App() {
               {currentQueue ? (
                 <>
                   {/* Queue Title Bar & Quick Actions */}
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3.5 sm:gap-4 p-4 sm:p-5 bg-white border border-[#E5E3DC] rounded-2xl shadow-sm">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3.5 sm:gap-4 p-4 sm:p-5 bg-white border border-[#E2E8F0] rounded-2xl shadow-xs">
                     <div className="flex items-center gap-3 sm:gap-3.5 min-w-0">
-                      <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-[#243447] text-white font-mono font-black text-base sm:text-lg flex items-center justify-center shrink-0 shadow-sm">
+                      <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-[#EFF6FF] text-[#2563EB] border border-[#BFDBFE] font-mono font-black text-base sm:text-lg flex items-center justify-center shrink-0 shadow-xs">
                         {currentQueue.code_prefix}
                       </div>
                       <div className="min-w-0">
                         <div className="flex items-center gap-2">
-                          <h1 className="text-base sm:text-xl font-black text-[#243447] tracking-tight truncate">{currentQueue.name}</h1>
+                          <h1 className="text-base sm:xl font-black text-[#1E293B] tracking-tight truncate">{currentQueue.name}</h1>
                         </div>
-                        <p className="text-xs text-[#30343B]/60 mt-0.5 flex items-center gap-2 truncate">
-                          <span className="flex items-center gap-1 font-semibold text-[#4F807A] shrink-0">
-                            <Building2 className="w-3.5 h-3.5 text-[#4F807A]" />
+                        <p className="text-xs text-[#64748B] mt-0.5 flex items-center gap-2 truncate">
+                          <span className="flex items-center gap-1 font-semibold text-[#2563EB] shrink-0">
+                            <Building2 className="w-3.5 h-3.5 text-[#2563EB]" />
                             {currentQueue.counter_name || 'Counter 1'}
                           </span>
                           {currentQueue.description && (
@@ -323,16 +323,16 @@ export default function App() {
                     <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
                       <button
                         onClick={() => setActiveTab('kiosk')}
-                        className="flex-1 sm:flex-none min-h-[38px] py-2 px-3 bg-[#F7F6F2] hover:bg-[#E5E3DC] text-[#243447] rounded-xl border border-[#E5E3DC] text-xs font-bold flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+                        className="flex-1 sm:flex-none min-h-[38px] py-2 px-3 bg-white hover:bg-[#F8FAFC] text-[#1E293B] rounded-xl border border-[#E2E8F0] text-xs font-bold flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
                         title="Open TV Counter Display"
                       >
-                        <Tv className="w-3.5 h-3.5 text-[#4F807A]" />
+                        <Tv className="w-3.5 h-3.5 text-[#2563EB]" />
                         <span>TV Kiosk</span>
                       </button>
 
                       <button
                         onClick={() => setIsAddTokenOpen(true)}
-                        className="flex-1 sm:flex-none min-h-[38px] py-2 px-3.5 bg-[#243447] hover:bg-[#1b2735] text-white rounded-xl text-xs font-bold shadow-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer"
+                        className="flex-1 sm:flex-none min-h-[38px] py-2 px-3.5 bg-[#2563EB] hover:bg-[#1D4ED8] text-white rounded-xl text-xs font-bold shadow-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer"
                       >
                         <Plus className="w-3.5 h-3.5" />
                         <span>Add Person</span>
@@ -367,12 +367,12 @@ export default function App() {
                   <RecentHistoryTable historyTokens={queueTokens.recentHistory} />
                 </>
               ) : (
-                <div className="p-12 text-center bg-white border border-[#E5E3DC] rounded-2xl shadow-sm">
-                  <h3 className="text-lg font-bold text-[#243447] mb-2">No Queues Available</h3>
-                  <p className="text-xs text-[#30343B]/60 mb-4">Create your first queue to start generating tokens and serving customers.</p>
+                <div className="p-12 text-center bg-white border border-[#E2E8F0] rounded-2xl shadow-xs">
+                  <h3 className="text-lg font-bold text-[#1E293B] mb-2">No Queues Available</h3>
+                  <p className="text-xs text-[#64748B] mb-4">Create your first queue to start generating tokens and serving customers.</p>
                   <button
                     onClick={() => setIsCreateQueueOpen(true)}
-                    className="px-4 py-2.5 bg-[#243447] hover:bg-[#1b2735] text-white font-bold text-xs rounded-xl shadow-xs inline-flex items-center gap-2"
+                    className="px-4 py-2.5 bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-bold text-xs rounded-xl shadow-xs inline-flex items-center gap-2"
                   >
                     <Plus className="w-4 h-4" />
                     <span>Create Your First Queue</span>
