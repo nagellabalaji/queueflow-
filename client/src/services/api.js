@@ -95,6 +95,10 @@ export const api = {
     () => request('/auth/demo', { method: 'POST' }),
     () => mockStorage.login('admin')
   ),
+  loginWithGoogle: withFallback(
+    (payload) => request('/auth/google', { method: 'POST', body: JSON.stringify(payload || {}) }),
+    (payload) => mockStorage.loginWithGoogle(payload?.email, payload?.name)
+  ),
   getCurrentUser: withFallback(
     () => request('/auth/me'),
     () => mockStorage.getCurrentUser()

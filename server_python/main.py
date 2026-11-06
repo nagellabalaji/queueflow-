@@ -135,6 +135,32 @@ def demo_login():
         "manager": {"id": manager["id"], "username": manager["username"], "name": manager["name"]}
     }
 
+@app.post("/api/auth/google")
+def google_login(payload: dict = None):
+    conn = get_db()
+    email = payload.get("email") if payload else None
+    display_name = payload.get("name") if payload else "Google Administrator"
+    username = email.split("@")[0] if email else "google.admin"
+
+    manager = conn.execute("SELECT * FROM managers WHERE username = ?", (username,)).fetchone()
+    if not manager:
+        pwd_hash = hash_password(f"google_{datetime.now().timestamp()}")
+        cur = conn.cursor()
+        cur.execute("INSERT INTO managers (username, password_hash, name) VALUES (?, ?, ?)", (username, pwd_hash, display_name))
+        conn.commit()
+        mgr_id = cur.lastrowid
+        manager = {"id": mgr_id, "username": username, "name": display_name}
+    else:
+        manager = dict(manager)
+    conn.close()
+
+    token = create_access_token({"id": manager["id"], "username": manager["username"], "name": manager["name"]})
+    return {
+        "message": "Google login successful",
+        "token": token,
+        "manager": {"id": manager["id"], "username": manager["username"], "name": manager["name"]}
+    }
+
 @app.get("/api/auth/me")
 def get_me(current_manager: dict = Depends(get_current_manager)):
     return {"manager": current_manager}

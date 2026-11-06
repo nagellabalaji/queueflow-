@@ -53,6 +53,12 @@ export function AuthProvider({ children }) {
     return data;
   };
 
+  const loginWithGoogle = async (payload) => {
+    const data = await api.loginWithGoogle(payload);
+    handleAuthSuccess(data.token, data.manager);
+    return data;
+  };
+
   const logout = () => {
     localStorage.removeItem('queueflow_token');
     setToken(null);
@@ -60,7 +66,7 @@ export function AuthProvider({ children }) {
   };
 
   return (
-    <AuthContext.Provider value={{ manager, token, loading, login, register, demoLogin, logout, isAuthenticated: !!manager }}>
+    <AuthContext.Provider value={{ manager, token, loading, login, register, demoLogin, loginWithGoogle, logout, isAuthenticated: !!manager }}>
       {children}
     </AuthContext.Provider>
   );

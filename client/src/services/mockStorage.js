@@ -62,6 +62,16 @@ export const mockStorage = {
     if (!m) m = state.managers[0];
     return { token: 'mock-jwt-token-gh-pages', manager: m };
   },
+  loginWithGoogle: async (email = 'admin@google.com', name = 'Google Administrator') => {
+    const state = loadState();
+    let m = state.managers.find(u => u.username === 'google.admin');
+    if (!m) {
+      m = { id: 99, username: 'google.admin', name: name, email: email };
+      state.managers.push(m);
+      saveState(state);
+    }
+    return { token: 'mock-jwt-google-gh-pages', manager: m };
+  },
   getCurrentUser: async () => {
     const state = loadState();
     return { manager: state.managers[0] };

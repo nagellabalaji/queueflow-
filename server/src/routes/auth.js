@@ -118,6 +118,42 @@ router.post('/demo', (req, res) => {
   }
 });
 
+// Google OAuth Sign-In endpoint
+router.post('/google', (req, res) => {
+  const { email, name } = req.body || {};
+  const googleUsername = email ? email.split('@')[0] : 'google.admin';
+  const displayName = name || 'Google Administrator';
+
+  try {
+    let manager = db.prepare('SELECT * FROM managers WHERE username = ?').get(googleUsername);
+    if (!manager) {
+      const salt = bcrypt.genSaltSync(10);
+      const password_hash = bcrypt.hashSync(`oauth_${Date.now()}`, salt);
+      const result = db.prepare(`
+        INSERT INTO managers (username, password_hash, name)
+        VALUES (?, ?, ?)
+      `).run(googleUsername, password_hash, displayName);
+      const id = Number(result.lastInsertRowid);
+      manager = { id, username: googleUsername, name: displayName };
+    }
+
+    const token = jwt.sign(
+      { id: manager.id, username: manager.username, name: manager.name },
+      JWT_SECRET,
+      { expiresIn: '7d' }
+    );
+
+    res.json({
+      message: 'Google login successful',
+      token,
+      manager: { id: manager.id, username: manager.username, name: manager.name }
+    });
+  } catch (error) {
+    console.error('Google login error:', error);
+    res.status(500).json({ error: 'Failed to authenticate with Google.' });
+  }
+});
+
 // Current manager session check
 router.get('/me', authenticateToken, (req, res) => {
   try {
